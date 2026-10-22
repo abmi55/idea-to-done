@@ -162,3 +162,7 @@ docs/plans/NNN-namn.md     implementeringsplan
   eget initiativ, bara du via `/idea`.
 - Dokumenten skrivs på svenska. Ändra raden om språk i `SKILL.md` om du vill
   ha ett annat språk.
+
+## Licens
+
+[MIT](LICENSE)
