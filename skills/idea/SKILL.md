@@ -23,6 +23,15 @@ Translate the section headings of the templates into that language. Keep
 status names, command names, IDs (Q1, A1, AC1, S1), code, file names, commands
 and error messages unchanged.
 
+## Project instructions
+
+Project instructions (CLAUDE.md, AGENTS.md) take precedence over this skill
+for paths, language, conventions and tooling. For example, use the project's
+folder for plans or decisions instead of `docs/plans` if it defines one.
+
+If the project defines its own idea or planning process: follow the project,
+tell the user about the overlap, and do not run both processes.
+
 ## Choose the mode
 
 Look at the first word of the arguments:
