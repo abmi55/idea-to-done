@@ -157,7 +157,7 @@ docs/plans/NNN-name.md     implementation plan
 ## Limitations
 
 > [!NOTE]
-> **Why Swedish?** I built this skill for my own projects, and Swedish is my native language. Briefs, open questions and acceptance criteria are where precision matters most, and I review and approve them fastest and most accurately in the language I think in. The skill and the documents it writes are therefore in Swedish. To use another language, edit the language line near the top of `skills/idea/SKILL.md`.
+> The skill and the documents it writes are in **Swedish**. To use another language, edit the language line near the top of `skills/idea/SKILL.md`.
 
 - "Do not write project files during intake" is an instruction, not a technical block. Claude follows it, but you can add a `PreToolUse` hook that blocks file edits outside `docs/` if you want a hard guarantee.
 - The stale-plan check needs the project to be a git repository.
