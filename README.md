@@ -45,18 +45,10 @@ AI coding agents are fast at writing code. That speed is also the risk. Without 
 
 ```mermaid
 flowchart LR
-    A["/idea &lt;description&gt;"] --> IDEA
-    IDEA -- "answer" --> IDEA
-    IDEA -- "approve" --> REFINED
-    REFINED -- "plan + approve" --> PLANNED
-    PLANNED -- "start" --> PROGRESS["IN PROGRESS"]
-    PROGRESS -- "done" --> DONE
-    IDEA -. "drop" .-> DROPPED
-    REFINED -. "drop" .-> DROPPED
-    PLANNED -. "drop" .-> DROPPED
-    PROGRESS -. "drop" .-> DROPPED
-    IDEA -. "too large" .-> SPLIT
+    IDEA -- approve --> REFINED -- "plan + approve" --> PLANNED -- start --> PROGRESS["IN PROGRESS"] -- done --> DONE
 ```
+
+Any status except `DONE` can be dropped with `/idea drop`. An idea that is too large becomes `SPLIT` when its brief is approved.
 
 | Status | Meaning |
 |---|---|
