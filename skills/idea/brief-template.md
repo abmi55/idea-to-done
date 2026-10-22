@@ -1,52 +1,52 @@
-# Brief-mall
+# Brief template
 
-Håll varje punkt så kort som idén tillåter. En sektion som inte gäller skrivs
-som "N/A" på en rad. En lite-brief (liten idé) får ha N/A i sektion 6–10.
+Keep each point as short as the idea allows. A section that does not apply is
+written as "N/A" on one line. A lite brief (small idea) may have N/A in
+sections 6–10.
 
 ## 1. Problem
-Vad det löser, för vem, och hur vi vet att det fungerade.
+What it solves, for whom, and how we know it worked.
 
-## 2. Scope i egna ord
-Vad du har förstått, omformulerat.
+## 2. Restated scope
+What you understood, in your own words.
 
-## 3. Öppna frågor
-Q1 … Q5, högst fem.
+## 3. Open questions
+Q1 … Q5, at most five.
 
-### Antaganden
-A1, A2 … Varje antagande som jag kan rätta.
+### Assumptions
+A1, A2 … Every assumption the user can correct.
 
-## 4. Acceptanskriterier
-Observerbara villkor för "klart". Ett per rad, med id:
+## 4. Acceptance criteria
+Observable conditions for "done". One per line, with an ID:
 - AC1: …
 - AC2: …
 
-## 5. Utanför scope
+## 5. Out of scope
 
-## 6. Kantfall och icke-funktionella krav
-Fel, tomma tillstånd, behörigheter, prestanda, säkerhet, integritet,
-bakåtkompatibilitet.
+## 6. Edge cases and non-functional concerns
+Errors, empty states, permissions, performance, security, privacy, backwards
+compatibility.
 
-## 7. Påverkansanalys
-Berörda moduler, filer, datamodeller, API:er och kod som kan återanvändas.
+## 7. Impact analysis
+Affected modules, files, data models, APIs and code that can be reused.
 
-Inspekterade filer:
+Inspected files:
 - …
 
-Inte inspekterat:
+Not inspected:
 - …
 
-## 8. Alternativ
-Bara om det finns ett verkligt val: 2–3 alternativ med för- och nackdelar
-och en rekommendation. Annars ett förslag.
+## 8. Options
+Only if there is a real choice: 2–3 options with trade-offs and a
+recommendation. Otherwise one proposal.
 
-## 9. Risker och beroenden
-Migreringar, brytande ändringar, externa tjänster, sådant som är svårt att
-ångra.
+## 9. Risks and dependencies
+Migrations, breaking changes, external services, anything hard to undo.
 
-## 10. Storlek
-Kan det levereras och verifieras som en enhet? Om inte: förslag på split i
-delar som kan levereras var för sig, med motivering.
+## 10. Size
+Can it be delivered and verified as one unit? If not: a proposed split into
+parts that can be delivered independently, with reasoning.
 
-## Utmaning
-Konflikter med befintlig funktionalitet, arkitektur eller tidigare beslut,
-eller "Inga funna".
+## Challenge
+Conflicts with existing functionality, architecture or earlier decisions, or
+"None found".

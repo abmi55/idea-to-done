@@ -1,14 +1,15 @@
-## Idéer och nya features
+## Ideas and new features
 
-Processen för idéer finns i skillen `/idea`. Dessa regler gäller alltid:
+The process for ideas lives in the `/idea` skill. These rules always apply:
 
-- Om jag i chatten beskriver en ny idé, feature eller beteendeändring som inte
-  täcks av en plan med status PLANNED: implementera inte och starta inte intake.
-  Fråga en gång per idé: "Det här låter som en ny idé. Kör `/idea`?" och vänta.
-- Ingen fråga behövs för: en buggfix, ett steg i en godkänd plan, en liten
-  ändring på några rader (text, namnbyte, konfigvärde), eller när jag skriver
+- If I describe a new idea, feature or behavior change in chat that is not
+  covered by a plan with status PLANNED: do not implement and do not start
+  intake. Ask once per idea, in my language: "This sounds like a new idea.
+  Run `/idea`?" and wait.
+- No question is needed for: a bug fix, a step in an approved plan, a small
+  change of a few lines (text, rename, config value), or when I write
   "skip intake".
-- Idéer som dyker upp under annat arbete startas aldrig. Skapa
-  `docs/backlog/NNN-namn.md` med status IDEA och 1–2 rader, fortsätt med
-  nuvarande steg och nämn idén i stegrapporten.
-- Implementera aldrig ett backlog-objekt som inte har status PLANNED.
+- Ideas that come up during other work are never started. Create
+  `docs/backlog/NNN-name.md` with status IDEA and 1–2 lines, continue the
+  current step and mention the idea in the step report.
+- Never implement a backlog item that does not have status PLANNED.

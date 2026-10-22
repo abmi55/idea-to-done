@@ -1,166 +1,174 @@
 ---
 name: idea
-description: Idé-intake från idé till leverans. Brief, godkännande, plan, implementering och verifiering mot acceptanskriterier, med backlog i docs/backlog och planer i docs/plans. Startas bara manuellt med /idea.
+description: Idea intake from first description to verified delivery. Brief, approval, plan, implementation and verification against acceptance criteria, with a backlog in docs/backlog and plans in docs/plans. Started manually with /idea only.
 disable-model-invocation: true
-argument-hint: "<beskrivning> | answer|approve|plan|start|done|drop NNN [text] | list"
+argument-hint: "<description> | answer|approve|plan|start|done|drop NNN [text] | list"
 ---
 
-# Idé-intake
+# Idea intake
 
-Argument: $ARGUMENTS
+Arguments: $ARGUMENTS
 
-Nuvarande backlog i detta projekt:
-!`ls docs/backlog 2>/dev/null || echo "(ingen backlog ännu)"`
+Current backlog in this project:
+!`ls docs/backlog 2>/dev/null || echo "(no backlog yet)"`
 
-Skriv alla backlog- och plandokument på svenska. Kod, filnamn, kommandon och
-felmeddelanden behålls som de är.
+## Language
 
-## Välj läge
+Write backlog and plan documents, and talk to the user, in the language the
+user writes in, unless the project's CLAUDE.md specifies another language.
+Translate the section headings of the templates into that language. Keep
+status names, command names, IDs (Q1, A1, AC1, S1), code, file names, commands
+and error messages unchanged.
 
-Titta på första ordet i argumentet:
+## Choose the mode
 
-| Första ordet | Läge |
+Look at the first word of the arguments:
+
+| First word | Mode |
 |---|---|
-| `list` | Lista |
-| `answer NNN <svar>` | Svar |
-| `approve NNN` | Godkänn |
+| `list` | List |
+| `answer NNN <answers>` | Answer |
+| `approve NNN` | Approve |
 | `plan NNN` | Plan |
 | `start NNN` | Start |
-| `done NNN` | Klar |
-| `drop NNN <skäl>` | Avbryt |
-| (tomt) | Visa tabellen ovan som hjälp och stoppa |
-| allt annat | Ny idé, hela argumentet är beskrivningen |
+| `done NNN` | Done |
+| `drop NNN <reason>` | Drop |
+| (empty) | Show the table above as help and stop |
+| anything else | New idea, the full arguments are the description |
 
-NNN är backlog-numret. Acceptera både `7` och `007`. Om filen inte finns: säg
-det och stoppa.
+NNN is the backlog number. Accept both `7` and `007`. If the file does not
+exist: say so and stop.
 
-## Grundregler för alla lägen
+## Rules for all modes
 
-- Läs status i backlog-filen innan du gör något. Om kommandot inte passar
-  statusen: säg vilken status filen har och vilket kommando som gäller. Stoppa.
-- Status ändras bara av dessa kommandon. "Ok", "låter bra" eller liknande i
-  chatten är inte ett godkännande. Hänvisa till `/idea approve NNN`.
-- Före status PLANNED: ändra inga projektfiler. De enda tillåtna skrivningarna
-  är `docs/backlog/NNN-*.md` och `docs/plans/NNN-*.md`.
-- Implementera aldrig under intake, även om idén verkar liten eller självklar.
-- Presentera aldrig gissningar som fynd. Säg uttryckligen vad som inte
-  inspekterats.
-- Vid varje statusändring: lägg till en rad under Historik i backlog-filen
-  (datum, ny status, kommando).
+- Read the status in the backlog file before you do anything. If the command
+  does not fit the status: say which status the file has and which command
+  applies. Stop.
+- Status changes only through these commands. "Ok", "sounds good" or similar
+  in chat is not an approval. Point to `/idea approve NNN`.
+- Before status PLANNED: do not change project files. The only allowed writes
+  are `docs/backlog/NNN-*.md` and `docs/plans/NNN-*.md`.
+- Never implement during intake, even if the idea seems small or obvious.
+- Never present guesses as findings. State explicitly what was not inspected.
+- On every status change: add a line under History in the backlog file (date,
+  new status, command).
 
-Filformat och statusar: se [backlog-format.md](backlog-format.md).
+File format and statuses: see [backlog-format.md](backlog-format.md).
 
-## Ny idé
+## New idea
 
-1. Jämför med backlog-listan ovan. Om en befintlig idé täcker samma sak: säg
-   det, föreslå `/idea answer NNN` på den, och skapa ingen ny fil förrän jag
-   bekräftar.
-2. Nummer: högsta befintliga NNN + 1, tre siffror. Namn: 2–4 ord i kebab-case,
-   utan å, ä och ö.
-3. Bedöm storleken:
-   - Liten idé (högst 2–3 filer, ingen ändring av datamodell eller API): läs
-     filerna direkt och skriv en lite-brief.
-   - Annars: gör kodinspektionen via en read-only Explore-subagent. Ge den
-     idén och be om berörda moduler, filer, datamodeller, API:er, kod som kan
-     återanvändas och en lista över inspekterade filer.
-4. Om idén är för vag för att skriva acceptanskriterier: skapa filen med status
-   IDEA och bara Problem och Frågor. Stoppa.
-5. Annars: skriv hela briefen enligt [brief-template.md](brief-template.md).
-6. Utmana idén (se nedan).
-7. Svara i chatten med: sökväg, sammanfattning på 2–3 rader, frågorna,
-   eventuella konflikter och nästa kommando. Stoppa.
+1. Compare with the backlog list above. If an existing idea covers the same
+   thing: say so, suggest `/idea answer NNN` on it, and create no new file
+   until the user confirms.
+2. Number: highest existing NNN + 1, three digits. Name: 2–4 words in
+   kebab-case, ASCII only.
+3. Judge the size:
+   - Small idea (at most 2–3 files, no change to data models or APIs): read
+     the files directly and write a lite brief.
+   - Otherwise: do the code inspection through a read-only Explore subagent.
+     Give it the idea and ask for affected modules, files, data models, APIs,
+     reusable code and a list of inspected files.
+4. If the idea is too vague to write acceptance criteria: create the file with
+   status IDEA and only Problem and Questions. Stop.
+5. Otherwise: write the full brief from [brief-template.md](brief-template.md).
+6. Challenge the idea (see below).
+7. Reply in chat with: the file path, a 2–3 line summary, the questions, any
+   conflicts and the next command. Stop.
 
-## Utmana idén
+## Challenge the idea
 
-Säg uttryckligen om idén:
-- duplicerar befintlig funktionalitet,
-- krockar med arkitekturen eller ett tidigare beslut (sök i `docs/backlog`,
-  `docs/plans` och eventuella ADR- eller arkitekturdokument),
-- har hög kostnad för lågt värde,
-- löses bättre på ett annat sätt.
+Say so explicitly if the idea:
+- duplicates existing functionality,
+- conflicts with the architecture or an earlier decision (search
+  `docs/backlog`, `docs/plans` and any ADR or architecture documents),
+- has high cost for low value,
+- is better solved another way.
 
-Redovisa konflikten och resonemanget. Lös den inte tyst. Beslutet är mitt.
+Report the conflict and the reasoning. Do not resolve it silently. The
+decision belongs to the user.
 
-## Frågor
+## Questions
 
-- Ställ högst fem öppna frågor, de viktigaste, numrerade Q1, Q2 …
-- Skriv alla övriga osäkerheter som numrerade antaganden A1, A2 … som jag kan
-  rätta.
+- Ask at most five open questions, the most important ones, numbered Q1, Q2 …
+- Write every other uncertainty as a numbered assumption A1, A2 … that the
+  user can correct.
 
-## Svar (answer)
+## Answer
 
-Kräver status IDEA.
-1. Koppla svaren till Q-numren, till exempel "Q1: ja, Q3: bara admin".
-2. Skriv in dem under Beslut.
-3. Uppdatera briefen: ta bort besvarade frågor, justera scope, acceptanskriterier
-   och antaganden.
-4. Om svaren väcker nya viktiga frågor: ställ dem. Högst fem öppna totalt.
-5. Visa vad som ändrats. Stoppa.
+Requires status IDEA.
+1. Map the answers to the Q numbers, for example "Q1: yes, Q3: admins only".
+2. Record them under Decisions.
+3. Update the brief: remove answered questions, adjust scope, acceptance
+   criteria and assumptions.
+4. If the answers raise new important questions: ask them. At most five open
+   in total.
+5. Show what changed. Stop.
 
-## Godkänn (approve)
+## Approve
 
-Grinden bestäms av nuvarande status:
-- IDEA till REFINED: briefen måste vara komplett, utan öppna frågor och med minst
-  ett acceptanskriterium. Annars: lista vad som saknas och stoppa. Om briefen
-  föreslår en split: genomför den (se Splitting).
-- REFINED med plan till PLANNED: planfilen måste finnas och vara länkad.
-- REFINED utan plan: säg att `/idea plan NNN` behövs först.
-- Annan status: säg att det inte finns något att godkänna.
+The gate depends on the current status:
+- IDEA to REFINED: the brief must be complete, with no open questions and at
+  least one acceptance criterion. Otherwise: list what is missing and stop. If
+  the brief proposes a split: carry it out (see Splitting).
+- REFINED with a plan to PLANNED: the plan file must exist and be linked.
+- REFINED without a plan: say that `/idea plan NNN` is needed first.
+- Any other status: say there is nothing to approve.
 
 ## Plan
 
-Kräver status REFINED.
-1. Läs briefen och besluten. Inspektera koden igen vid behov, med samma regler
-   som vid ny idé.
-2. Skriv `docs/plans/NNN-namn.md` enligt [plan-template.md](plan-template.md).
-3. Varje steg anger vilka acceptanskriterier det uppfyller. Varje
-   acceptanskriterium täcks av minst ett steg.
-4. Länka planen i backlog-filen.
-5. Stoppa och be om `/idea approve NNN`.
+Requires status REFINED.
+1. Read the brief and the decisions. Inspect the code again if needed, with
+   the same rules as for a new idea.
+2. Write `docs/plans/NNN-name.md` from [plan-template.md](plan-template.md).
+3. Every step names the acceptance criteria it satisfies. Every acceptance
+   criterion is covered by at least one step.
+4. Link the plan in the backlog file.
+5. Stop and ask for `/idea approve NNN`.
 
 ## Start
 
-Kräver status PLANNED.
-1. Kontrollera om briefen är inaktuell. Om projektet är ett git-repo: kör
-   `git log --since=<briefens datum> --name-only` och jämför med filerna i
-   Påverkansanalys och planen. Om berörda filer har ändrats: rapportera vilka
-   och fråga om planen ska uppdateras eller köras ändå. Stoppa tills jag svarat.
-2. Sätt status IN PROGRESS.
-3. Genomför planstegen i ordning. Efter varje steg: bocka av det i planen och
-   ge en kort stegrapport (vad, vilka filer, hur det verifierats).
-4. Nya idéer som dyker upp under arbetet startas aldrig. Skapa en IDEA-fil på
-   1–2 rader utan brief, fortsätt och nämn den i stegrapporten.
-5. Om något kräver avvikelse från planen som ändrar scope eller
-   acceptanskriterier: stoppa och fråga.
+Requires status PLANNED.
+1. Check whether the brief is stale. If the project is a git repository: run
+   `git log --since=<brief date> --name-only` and compare with the files in
+   the impact analysis and the plan. If affected files have changed: report
+   which ones and ask whether to update the plan or run it anyway. Stop until
+   the user answers.
+2. Set status IN PROGRESS.
+3. Carry out the plan steps in order. After each step: check it off in the
+   plan and give a short step report (what, which files, how it was verified).
+4. New ideas that come up during the work are never started. Create an IDEA
+   file of 1–2 lines without a brief, continue, and mention it in the step
+   report.
+5. If something requires a deviation from the plan that changes scope or
+   acceptance criteria: stop and ask.
 
-## Klar (done)
+## Done
 
-Kräver status IN PROGRESS och att alla plansteg är avbockade.
-1. Verifiera varje acceptanskriterium med bevis: ett test som körts, ett
-   kommando och dess utdata, eller en beskriven manuell kontroll.
-2. Fyll i Verifiering-tabellen i backlog-filen.
-3. Om något kriterium inte är uppfyllt: behåll IN PROGRESS och rapportera vad
-   som fattas.
-4. Om alla är uppfyllda: sätt status DONE.
+Requires status IN PROGRESS and all plan steps checked off.
+1. Verify every acceptance criterion with evidence: a test that ran, a command
+   and its output, or a described manual check.
+2. Fill in the Verification table in the backlog file.
+3. If a criterion is not met: keep IN PROGRESS and report what is missing.
+4. If all are met: set status DONE.
 
-## Avbryt (drop)
+## Drop
 
-Tillåtet för alla statusar utom DONE. Sätt status DROPPED och spara skälet.
-Om status var IN PROGRESS: lista kodändringar som redan gjorts. Återställ
-ingenting utan att fråga.
+Allowed for every status except DONE. Set status DROPPED and record the
+reason. If the status was IN PROGRESS: list the code changes already made.
+Revert nothing without asking.
 
-## Lista
+## List
 
-Läs alla filer i `docs/backlog`. Visa en tabell med nummer, titel, status och
-nästa kommando, grupperad efter status.
+Read all files in `docs/backlog`. Show a table with number, title, status and
+next command, grouped by status.
 
 ## Splitting
 
-Om arbetet inte kan levereras och verifieras som en enhet: föreslå en split i
-briefens Storlek-sektion och motivera den. Det finns ingen fast storleksgräns.
-När briefen godkänns:
-- skapa en backlog-fil per del, med nya nummer, status IDEA, sin del av briefen
-  och en länk till föräldern,
-- sätt förälderns status till SPLIT och lista delarna i den.
+If the work cannot be delivered and verified as one unit: propose a split in
+the Size section of the brief and explain it. There is no fixed size limit.
+When the brief is approved:
+- create one backlog file per part, with new numbers, status IDEA, its part of
+  the brief and a link to the parent,
+- set the parent's status to SPLIT and list the parts in it.
 
-Varje del går sedan igenom egen brief, plan och godkännanden.
+Each part then goes through its own brief, plan and approvals.

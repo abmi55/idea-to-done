@@ -1,38 +1,38 @@
-# Plan-mall
+# Plan template
 
-Fil: `docs/plans/NNN-namn.md`
+File: `docs/plans/NNN-name.md`
 
 ```markdown
-# Plan NNN: Titel
+# Plan NNN: Title
 
-Brief: [NNN-namn](../backlog/NNN-namn.md)
-Skapad: YYYY-MM-DD
+Brief: [NNN-name](../backlog/NNN-name.md)
+Created: YYYY-MM-DD
 
-## Översikt
-2–3 rader om angreppssättet.
+## Overview
+2–3 lines on the approach.
 
-## Steg
-- [ ] S1: Vad som görs.
-  Filer: …
-  Uppfyller: AC1
-  Verifiering: test, kommando eller manuell kontroll.
+## Steps
+- [ ] S1: What is done.
+  Files: …
+  Satisfies: AC1
+  Verification: test, command or manual check.
 - [ ] S2: …
 
-## Täckning
-| AC | Steg |
+## Coverage
+| AC | Steps |
 |---|---|
 | AC1 | S1, S3 |
 
-## Teststrategi
-Vilka tester läggs till eller ändras, och hur de körs.
+## Test strategy
+Which tests are added or changed, and how they run.
 
-## Migrering och återställning
-Bara om relevant. Annars "N/A".
+## Migration and rollback
+Only if relevant. Otherwise "N/A".
 
-## Risker under implementeringen
+## Implementation risks
 ```
 
-Regler:
-- Varje steg ska kunna verifieras för sig.
-- Varje acceptanskriterium ska finnas i Täckning-tabellen.
-- Inga steg utanför briefens scope.
+Rules:
+- Every step can be verified on its own.
+- Every acceptance criterion appears in the Coverage table.
+- No steps outside the scope of the brief.

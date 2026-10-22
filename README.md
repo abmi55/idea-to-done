@@ -39,6 +39,7 @@ AI coding agents are fast at writing code. That speed is also the risk. Without 
 - ⏱️ **Stale-plan check.** `/idea start` uses `git log` to detect changes to affected files since the brief was written.
 - 📥 **Capture without derailing.** Ideas that come up during other work become a two-line backlog file, and the current work continues.
 - 🪶 **Light for small ideas.** A small idea gets a short brief, with `N/A` for sections that do not apply and no subagent.
+- 🌍 **Speaks your language.** Briefs and plans are written in the language you write in, unless your project's `CLAUDE.md` says otherwise.
 - 🧠 **Context-friendly.** The full process loads only when you run `/idea`. Only four always-on rules live in your global configuration.
 
 ## Workflow
@@ -155,9 +156,6 @@ docs/plans/NNN-name.md     implementation plan
 ```
 
 ## Limitations
-
-> [!NOTE]
-> The skill and the documents it writes are in **Swedish**. To use another language, edit the language line near the top of `skills/idea/SKILL.md`.
 
 - "Do not write project files during intake" is an instruction, not a technical block. Claude follows it, but you can add a `PreToolUse` hook that blocks file edits outside `docs/` if you want a hard guarantee.
 - The stale-plan check needs the project to be a git repository.

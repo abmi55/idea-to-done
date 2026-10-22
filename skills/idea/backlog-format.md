@@ -1,52 +1,52 @@
-# Backlog-format
+# Backlog format
 
-Plats: `docs/backlog/NNN-namn.md`, en fil per idé. NNN har tre siffror.
+Location: `docs/backlog/NNN-name.md`, one file per idea. NNN has three digits.
 
-## Statusar
+## Statuses
 
-| Status | Betydelse | Nästa kommando |
+| Status | Meaning | Next command |
 |---|---|---|
-| IDEA | Ny eller under förfining | `answer`, `approve` |
-| REFINED | Brief godkänd | `plan`, sedan `approve` |
-| PLANNED | Plan godkänd | `start` |
-| IN PROGRESS | Implementeras | `done` |
-| DONE | Alla acceptanskriterier verifierade | – |
-| DROPPED | Avbruten, skälet sparat | – |
-| SPLIT | Uppdelad i egna backlog-filer | (delarnas kommandon) |
+| IDEA | New or being refined | `answer`, `approve` |
+| REFINED | Brief approved | `plan`, then `approve` |
+| PLANNED | Plan approved | `start` |
+| IN PROGRESS | Being implemented | `done` |
+| DONE | All acceptance criteria verified | – |
+| DROPPED | Cancelled, reason recorded | – |
+| SPLIT | Divided into separate backlog files | (the parts' commands) |
 
-## Full fil
+## Full file
 
 ```markdown
-# NNN: Titel
+# NNN: Title
 
 Status: IDEA
-Skapad: YYYY-MM-DD
+Created: YYYY-MM-DD
 Plan: –
-Förälder: –
-Delar: –
+Parent: –
+Parts: –
 
 ## Brief
-(enligt brief-template.md)
+(from brief-template.md)
 
-## Beslut
+## Decisions
 - Q1: …
 
-## Verifiering
-| AC | Resultat | Bevis |
+## Verification
+| AC | Result | Evidence |
 |---|---|---|
 
-## Historik
+## History
 - YYYY-MM-DD IDEA (/idea)
 ```
 
-## Kort fil för idéer under annat arbete
+## Short file for ideas found during other work
 
 ```markdown
-# NNN: Titel
+# NNN: Title
 
 Status: IDEA
-Skapad: YYYY-MM-DD
-Upptäckt under: NNN, steg Sx
+Created: YYYY-MM-DD
+Found during: NNN, step Sx
 
-1–2 rader om idén.
+1–2 lines about the idea.
 ```
