@@ -9,6 +9,9 @@ argument-hint: "<description> | answer|approve|plan|start|done|drop NNN [text] |
 
 Arguments: $ARGUMENTS
 
+If the line above shows no arguments, or an unreplaced placeholder, take the
+arguments from the user's message instead: everything after `/idea`.
+
 Start every mode by listing the files in `docs/backlog` with a file search
 tool. If the folder does not exist, the backlog is empty.
 
@@ -65,9 +68,11 @@ File format and statuses: see [backlog-format.md](backlog-format.md).
 3. Judge the size:
    - Small idea (at most 2–3 files, no change to data models or APIs): read
      the files directly and write a lite brief.
-   - Otherwise: do the code inspection through a read-only Explore subagent.
-     Give it the idea and ask for affected modules, files, data models, APIs,
-     reusable code and a list of inspected files.
+   - Otherwise: do the code inspection through a read-only subagent, such as
+     Explore in Claude Code, so the main context is not filled with file
+     contents. Give the subagent the idea and ask for affected modules, files,
+     data models, APIs, reusable code and a list of inspected files. If no
+     subagent is available, read the files directly.
 4. If the idea is too vague to write acceptance criteria: create the file with
    status IDEA and only Problem and Questions. Stop.
 5. Otherwise: write the full brief from [brief-template.md](brief-template.md).

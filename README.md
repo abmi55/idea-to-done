@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Status](https://img.shields.io/badge/status-stable-brightgreen)
 
-[Why](#why) · [Features](#features) · [Workflow](#workflow) · [Commands](#commands) · [Install](#install) · [Limitations](#limitations)
+[Why](#why) · [Features](#features) · [Workflow](#workflow) · [Commands](#commands) · [Install](#install) · [Compatibility](#compatibility) · [Limitations](#limitations)
 
 </div>
 
@@ -137,6 +137,20 @@ Restart Claude Code and type `/idea` to see the help.
 > [!TIP]
 > If a project's `CLAUDE.md` already has its own idea rules, remove them so Claude does not get two conflicting versions.
 
+## Compatibility
+
+`/idea` is built and tested for **Claude Code**. The skill follows the open [Agent Skills](https://agentskills.io) format (`SKILL.md`), so other tools that support the format, such as OpenAI Codex, GitHub Copilot, Gemini CLI or Cursor, can likely load it too. These tools are not tested.
+
+| Part | Claude Code | Other tools |
+|---|---|---|
+| Workflow, templates, backlog files | ✅ | ✅ Plain Markdown and instructions |
+| Manual start only (`disable-model-invocation`) | ✅ | ⚠️ May be ignored, so the agent could start the skill on its own |
+| Arguments (`/idea plan 007`) | ✅ | ⚠️ The skill falls back to reading them from your message |
+| Read-only code inspection subagent | ✅ Explore | ⚠️ Uses a subagent if one exists, otherwise reads files directly |
+| Always-on rules | ✅ `~/.claude/rules/` | ⚠️ Paste `rules/AGENTS.md` into your tool's `AGENTS.md` |
+
+**Using another tool:** copy `skills/idea` into the skills folder your tool uses (see its documentation), and add the contents of `rules/AGENTS.md` to the project's or your global `AGENTS.md`.
+
 ## Repository layout
 
 ```text
@@ -146,7 +160,8 @@ skills/idea/
 ├── plan-template.md    plan format with a coverage table
 └── backlog-format.md   statuses and file format
 rules/
-└── idea-intake.md      always-on rules, active even without /idea
+├── idea-intake.md      always-on rules for Claude Code
+└── AGENTS.md           the same rules for tools that read AGENTS.md
 ```
 
 In each project, the skill creates:
