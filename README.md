@@ -102,15 +102,15 @@ Skillen installeras globalt och gäller då i alla dina projekt.
 **macOS, Linux eller Git Bash:**
 
 ```bash
-git clone https://github.com/<ditt-konto>/claude-idea-skill.git
-cp -r claude-idea-skill/skills/idea ~/.claude/skills/
-mkdir -p ~/.claude/rules && cp claude-idea-skill/rules/idea-intake.md ~/.claude/rules/
+git clone https://github.com/abmi55/idea-to-done.git
+cp -r idea-to-done/skills/idea ~/.claude/skills/
+mkdir -p ~/.claude/rules && cp idea-to-done/rules/idea-intake.md ~/.claude/rules/
 ```
 
 **Windows PowerShell:**
 
 ```powershell
-git clone https://github.com/<ditt-konto>/claude-idea-skill.git
+git clone https://github.com/abmi55/idea-to-done.git
 Copy-Item -Recurse claude-idea-skill\skills\idea $HOME\.claude\skills\
 New-Item -ItemType Directory -Force $HOME\.claude\rules
 Copy-Item claude-idea-skill\rules\idea-intake.md $HOME\.claude\rules\
