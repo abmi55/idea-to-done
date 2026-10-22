@@ -111,9 +111,9 @@ mkdir -p ~/.claude/rules && cp idea-to-done/rules/idea-intake.md ~/.claude/rules
 
 ```powershell
 git clone https://github.com/abmi55/idea-to-done.git
-Copy-Item -Recurse claude-idea-skill\skills\idea $HOME\.claude\skills\
+Copy-Item -Recurse idea-to-done\skills\idea $HOME\.claude\skills\
 New-Item -ItemType Directory -Force $HOME\.claude\rules
-Copy-Item claude-idea-skill\rules\idea-intake.md $HOME\.claude\rules\
+Copy-Item idea-to-done\rules\idea-intake.md $HOME\.claude\rules\
 ```
 
 Starta om Claude Code och skriv `/idea` för att se hjälpen.
