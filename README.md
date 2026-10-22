@@ -1,93 +1,109 @@
-# /idea – idé-intake för Claude Code
+<div align="center">
 
-En skill för [Claude Code](https://code.claude.com) som tar en idé hela vägen
-från första beskrivning till verifierad leverans. Varje steg har en tydlig grind
-som du själv godkänner.
+# idea-to-done
 
+**A Claude Code skill that takes an idea from first description to verified delivery, with a gate you approve at every step.**
+
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-skill-D97757)](https://code.claude.com)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Status](https://img.shields.io/badge/status-stable-brightgreen)
+
+[Why](#why) · [Features](#features) · [Workflow](#workflow) · [Commands](#commands) · [Install](#install) · [Limitations](#limitations)
+
+</div>
+
+---
+
+## Why
+
+AI coding agents are fast at writing code. That speed is also the risk. Without a process, the same problems show up again and again:
+
+| Problem | What happens |
+|---|---|
+| **Code before understanding** | A half-formed idea becomes code before anyone asks what problem it solves, for whom, or how to tell it worked. |
+| **Silent scope creep** | The agent fills gaps on its own and builds more, or something else, than you meant. |
+| **"Done" means "written"** | Nobody checks that the delivered change actually meets the requirements. |
+| **Lost ideas** | An idea that comes up mid-task is either forgotten or started at once, and focus is lost. |
+| **Vague approvals** | A casual "sounds good" in chat is read as permission to implement. |
+| **Guesses presented as facts** | The agent describes code it never read as if it had inspected it. |
+
+`/idea` fixes this with a simple order: **understand, plan, build, prove.**
+
+## Features
+
+- 🚦 **Explicit gates.** Status changes only through commands like `/idea approve 007`. A chat "ok" never counts, so you always know exactly what you approved.
+- 🔒 **No code before an approved plan.** During intake the agent may read the codebase but writes only the backlog and plan documents.
+- 🔗 **End-to-end traceability.** Questions (`Q1`), assumptions (`A1`) and acceptance criteria (`AC1`) get IDs. Every plan step names the criteria it satisfies, and `/idea done` verifies them one by one, with evidence.
+- 🗣️ **Pushback built in.** The agent says so when an idea duplicates existing functionality, conflicts with the architecture or costs more than it returns. The decision stays yours.
+- 🔍 **Honest about what was read.** Every brief lists the files that were inspected, and the ones that were not.
+- ⏱️ **Stale-plan check.** `/idea start` uses `git log` to detect changes to affected files since the brief was written.
+- 📥 **Capture without derailing.** Ideas that come up during other work become a two-line backlog file, and the current work continues.
+- 🪶 **Light for small ideas.** A small idea gets a short brief, with `N/A` for sections that do not apply and no subagent.
+- 🧠 **Context-friendly.** The full process loads only when you run `/idea`. Only four always-on rules live in your global configuration.
+
+## Workflow
+
+```mermaid
+flowchart LR
+    A["/idea &lt;description&gt;"] --> IDEA
+    IDEA -- "answer" --> IDEA
+    IDEA -- "approve" --> REFINED
+    REFINED -- "plan + approve" --> PLANNED
+    PLANNED -- "start" --> PROGRESS["IN PROGRESS"]
+    PROGRESS -- "done" --> DONE
+    IDEA -. "drop" .-> DROPPED
+    REFINED -. "drop" .-> DROPPED
+    PLANNED -. "drop" .-> DROPPED
+    PROGRESS -. "drop" .-> DROPPED
+    IDEA -. "too large" .-> SPLIT
 ```
-/idea <beskrivning>  →  IDEA  →  REFINED  →  PLANNED  →  IN PROGRESS  →  DONE
-                              approve     approve      start          done
-```
 
-## Varför behövs den?
+| Status | Meaning |
+|---|---|
+| `IDEA` | New or being refined |
+| `REFINED` | Brief approved |
+| `PLANNED` | Plan approved |
+| `IN PROGRESS` | Being implemented |
+| `DONE` | All acceptance criteria verified |
+| `DROPPED` | Cancelled, reason recorded |
+| `SPLIT` | Divided into smaller parts, each with its own backlog file |
 
-En AI-agent som Claude är snabb på att skriva kod. Just det är också risken.
-Utan en process händer ofta följande:
+### What a brief contains
 
-- **Agenten börjar implementera direkt.** En halvtänkt idé blir kod innan
-  någon har frågat vad problemet egentligen är, för vem det löses eller hur man
-  vet att det fungerar.
-- **Scope växer i det tysta.** Agenten tolkar luckor på egen hand och bygger mer
-  eller annat än det som var tänkt.
-- **"Klart" betyder "koden är skriven".** Ingen kontrollerar att det som
-  levererades faktiskt uppfyller kraven.
-- **Idéer försvinner.** Något som dyker upp mitt i annat arbete blir antingen
-  bortglömt eller påbörjat direkt, och då tappar man fokus på det man höll på
-  med.
-- **Godkännanden blir otydliga.** Ett "låter bra" i chatten tolkas som klartecken
-  att implementera.
-- **Gissningar ser ut som fakta.** Agenten beskriver kod den aldrig har läst som
-  om den hade inspekterat den.
+1. **Problem:** what it solves, for whom, and how we know it worked
+2. **Restated scope** in the agent's own words
+3. **Open questions:** at most five, plus numbered assumptions you can correct
+4. **Acceptance criteria:** observable conditions for "done"
+5. **Out of scope**
+6. **Edge cases and non-functional concerns:** errors, empty states, permissions, performance, security, privacy, backwards compatibility
+7. **Impact analysis:** affected modules, files, data models and APIs, plus a list of inspected files
+8. **Options:** only when there is a real choice, with a recommendation
+9. **Risks and dependencies:** migrations, breaking changes, anything hard to undo
+10. **Size:** a proposed split if the work cannot be delivered and verified as one unit
 
-Skillen löser detta med en enkel struktur: först förstå, sedan planera, sedan
-bygga och till sist bevisa.
+## Commands
 
-## Vad den gör bra
-
-**Tydliga grindar.** Status ändras bara via kommandon som `/idea approve 007`.
-Ett "ok" i chatten räknas inte. Du vet alltid exakt vad du har godkänt.
-
-**Ingen kod före en godkänd plan.** Under intake får agenten läsa koden men
-bara skriva i backlog- och plandokumenten.
-
-**Spårbarhet från början till slut.** Frågor (Q1 …), antaganden (A1 …) och
-acceptanskriterier (AC1 …) får id:n. Varje plansteg anger vilka kriterier det
-uppfyller. `/idea done` verifierar kriterium för kriterium, med bevis.
-
-**Agenten säger emot.** Om idén duplicerar något som redan finns, krockar med
-arkitekturen eller kostar mer än den ger, så säger agenten det. Beslutet är
-fortfarande ditt.
-
-**Ärlighet om vad som lästs.** Briefen listar vilka filer som inspekterades och
-vilka som inte gjorde det.
-
-**Skydd mot inaktuella planer.** `/idea start` kontrollerar med `git log` om
-berörda filer har ändrats sedan briefen skrevs.
-
-**Idéer under arbetet sparas utan att avbryta.** De skrivs som en kort
-backlog-fil, och arbetet fortsätter.
-
-**Lätt för små idéer.** En liten idé får en kort brief där sektioner som inte
-gäller skrivs som "N/A". Ingen subagent behövs.
-
-**Sparar kontext.** Hela processen ligger i skillen och laddas bara när du kör
-`/idea`. Det som alltid måste gälla är fyra rader i `rules/`.
-
-## Kommandon
-
-| Kommando | Kräver status | Gör |
+| Command | Requires | Does |
 |---|---|---|
-| `/idea <beskrivning>` | – | Läser koden, skapar backlog-fil och skriver brief |
-| `/idea answer NNN <svar>` | IDEA | Lägger in dina svar och uppdaterar briefen |
-| `/idea approve NNN` | IDEA / REFINED | Godkänner brief eller plan |
-| `/idea plan NNN` | REFINED | Skriver implementeringsplanen |
-| `/idea start NNN` | PLANNED | Kontrollerar aktualitet och implementerar steg för steg |
-| `/idea done NNN` | IN PROGRESS | Verifierar varje acceptanskriterium |
-| `/idea drop NNN <skäl>` | allt utom DONE | Avbryter idén och sparar skälet |
-| `/idea list` | – | Visar backloggen |
+| `/idea <description>` | – | Reads the code, creates a backlog file and writes the brief |
+| `/idea answer NNN <answers>` | `IDEA` | Records your answers and updates the brief |
+| `/idea approve NNN` | `IDEA` / `REFINED` | Approves the brief or the plan |
+| `/idea plan NNN` | `REFINED` | Writes the implementation plan |
+| `/idea start NNN` | `PLANNED` | Checks for stale files, then implements step by step |
+| `/idea done NNN` | `IN PROGRESS` | Verifies every acceptance criterion |
+| `/idea drop NNN <reason>` | any except `DONE` | Cancels the idea and records why |
+| `/idea list` | – | Shows the backlog |
 
-## Exempel
+### Example
 
+```text
+/idea Users should be able to export their listings as CSV
 ```
-/idea Användare ska kunna exportera sina annonser som CSV
-```
 
-Claude skapar `docs/backlog/001-csv-export.md` med en brief: problem, scope,
-högst fem frågor, acceptanskriterier, påverkansanalys med inspekterade filer,
-risker och storlek. Sedan stannar Claude.
+Claude creates `docs/backlog/001-csv-export.md` with a full brief and stops. Then:
 
-```
-/idea answer 001 Q1: bara egna annonser, Q2: semikolon som separator
+```text
+/idea answer 001 Q1: own listings only, Q2: semicolon as separator
 /idea approve 001
 /idea plan 001
 /idea approve 001
@@ -95,11 +111,12 @@ risker och storlek. Sedan stannar Claude.
 /idea done 001
 ```
 
-## Installation
+## Install
 
-Skillen installeras globalt och gäller då i alla dina projekt.
+The skill installs globally and works in every project.
 
-**macOS, Linux eller Git Bash:**
+<details open>
+<summary><b>macOS, Linux or Git Bash</b></summary>
 
 ```bash
 git clone https://github.com/abmi55/idea-to-done.git
@@ -107,7 +124,10 @@ cp -r idea-to-done/skills/idea ~/.claude/skills/
 mkdir -p ~/.claude/rules && cp idea-to-done/rules/idea-intake.md ~/.claude/rules/
 ```
 
-**Windows PowerShell:**
+</details>
+
+<details>
+<summary><b>Windows PowerShell</b></summary>
 
 ```powershell
 git clone https://github.com/abmi55/idea-to-done.git
@@ -116,53 +136,41 @@ New-Item -ItemType Directory -Force $HOME\.claude\rules
 Copy-Item idea-to-done\rules\idea-intake.md $HOME\.claude\rules\
 ```
 
-Starta om Claude Code och skriv `/idea` för att se hjälpen.
+</details>
 
-Om du redan har egna idé-regler i ett projekts `CLAUDE.md`: ta bort dem, så att
-Claude inte får två versioner som säger olika saker.
+Restart Claude Code and type `/idea` to see the help.
 
-## Filer
+> [!TIP]
+> If a project's `CLAUDE.md` already has its own idea rules, remove them so Claude does not get two conflicting versions.
 
-```
+## Repository layout
+
+```text
 skills/idea/
-  SKILL.md            lägen, grindar och regler
-  brief-template.md   de tio sektionerna i en brief
-  plan-template.md    planformat med täckningstabell
-  backlog-format.md   statusar och filformat
+├── SKILL.md            modes, gates and rules
+├── brief-template.md   the ten brief sections
+├── plan-template.md    plan format with a coverage table
+└── backlog-format.md   statuses and file format
 rules/
-  idea-intake.md      regler som alltid gäller, även utan /idea
+└── idea-intake.md      always-on rules, active even without /idea
 ```
 
-I varje projekt skapar skillen:
+In each project, the skill creates:
 
+```text
+docs/backlog/NNN-name.md   brief, decisions, verification and history
+docs/plans/NNN-name.md     implementation plan
 ```
-docs/backlog/NNN-namn.md   brief, beslut, verifiering och historik
-docs/plans/NNN-namn.md     implementeringsplan
-```
 
-## Statusar
+## Limitations
 
-| Status | Betydelse |
-|---|---|
-| IDEA | Ny eller under förfining |
-| REFINED | Brief godkänd |
-| PLANNED | Plan godkänd |
-| IN PROGRESS | Implementeras |
-| DONE | Alla acceptanskriterier verifierade |
-| DROPPED | Avbruten, skälet sparat |
-| SPLIT | Uppdelad i mindre delar, var och en med egen backlog-fil |
+> [!NOTE]
+> The skill and the documents it writes are in **Swedish**. To use another language, edit the language line near the top of `skills/idea/SKILL.md`.
 
-## Begränsningar
+- "Do not write project files during intake" is an instruction, not a technical block. Claude follows it, but you can add a `PreToolUse` hook that blocks file edits outside `docs/` if you want a hard guarantee.
+- The stale-plan check needs the project to be a git repository.
+- The skill sets `disable-model-invocation: true`. Claude never starts it on its own, only you can, with `/idea`.
 
-- Regeln "skriv inga projektfiler under intake" är en instruktion, inte ett
-  tekniskt hinder. Claude följer den, men om du vill ha en hård spärr kan du
-  lägga till en `PreToolUse`-hook som blockerar filändringar utanför `docs/`.
-- Kontrollen av inaktuella planer kräver att projektet är ett git-repo.
-- Skillen har `disable-model-invocation: true`. Claude startar den aldrig på
-  eget initiativ, bara du via `/idea`.
-- Dokumenten skrivs på svenska. Ändra raden om språk i `SKILL.md` om du vill
-  ha ett annat språk.
+## License
 
-## Licens
-
-[MIT](LICENSE)
+[MIT](LICENSE) © 2026 Abbas Mirhazar
