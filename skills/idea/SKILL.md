@@ -9,8 +9,8 @@ argument-hint: "<description> | answer|approve|plan|start|done|drop NNN [text] |
 
 Arguments: $ARGUMENTS
 
-Current backlog in this project:
-!`ls docs/backlog 2>/dev/null || echo "(no backlog yet)"`
+Start every mode by listing the files in `docs/backlog` with a file search
+tool. If the folder does not exist, the backlog is empty.
 
 ## Language
 
@@ -57,7 +57,7 @@ File format and statuses: see [backlog-format.md](backlog-format.md).
 
 ## New idea
 
-1. Compare with the backlog list above. If an existing idea covers the same
+1. Compare with the existing backlog files. If an existing idea covers the same
    thing: say so, suggest `/idea answer NNN` on it, and create no new file
    until the user confirms.
 2. Number: highest existing NNN + 1, three digits. Name: 2–4 words in

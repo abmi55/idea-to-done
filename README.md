@@ -113,8 +113,9 @@ The skill installs globally and works in every project.
 
 ```bash
 git clone https://github.com/abmi55/idea-to-done.git
+mkdir -p ~/.claude/skills ~/.claude/rules
 cp -r idea-to-done/skills/idea ~/.claude/skills/
-mkdir -p ~/.claude/rules && cp idea-to-done/rules/idea-intake.md ~/.claude/rules/
+cp idea-to-done/rules/idea-intake.md ~/.claude/rules/
 ```
 
 </details>
@@ -124,8 +125,8 @@ mkdir -p ~/.claude/rules && cp idea-to-done/rules/idea-intake.md ~/.claude/rules
 
 ```powershell
 git clone https://github.com/abmi55/idea-to-done.git
+New-Item -ItemType Directory -Force $HOME\.claude\skills, $HOME\.claude\rules | Out-Null
 Copy-Item -Recurse idea-to-done\skills\idea $HOME\.claude\skills\
-New-Item -ItemType Directory -Force $HOME\.claude\rules
 Copy-Item idea-to-done\rules\idea-intake.md $HOME\.claude\rules\
 ```
 
