@@ -27,9 +27,16 @@ Created: YYYY-MM-DD
 Which tests are added or changed, and how they run.
 
 ## Dependencies
-New dependencies, or "None". Per dependency: name and version, why it is
-needed, and which alternative was rejected (the standard library or an
-installed dependency).
+New dependencies and framework APIs used for the first time, or "None".
+Per item:
+
+- <name> <exact version>
+  Why: why it is needed.
+  Rejected: the alternative (the standard library or an installed dependency).
+  Checked: <source>, YYYY-MM-DD | Not verified against current docs
+  Notes: deprecations or breaking changes that matter, or "None".
+
+Research: [NNN-research](NNN-research.md), or "–".
 
 ## Migration and rollback
 Only if relevant. Otherwise "N/A".
@@ -42,6 +49,23 @@ Rules:
 - Every acceptance criterion appears in the Coverage table.
 - No steps outside the scope of the brief.
 - Every new dependency is listed under Dependencies.
+
+## Research file
+
+Only when needed (see Plan in SKILL.md). File: `docs/plans/NNN-research.md`
+
+```markdown
+# Research NNN: Title
+
+Plan: [NNN-name](NNN-name.md)
+Created: YYYY-MM-DD
+
+## R1: <the question>
+Decision: what was chosen.
+Rationale: why.
+Alternatives considered: what else was evaluated and why it was rejected.
+Sources: <link or tool>, YYYY-MM-DD
+```
 
 ## Steps added by done
 

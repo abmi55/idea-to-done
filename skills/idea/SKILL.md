@@ -182,15 +182,28 @@ Done when:
 Requires status REFINED.
 1. Read the brief and the decisions. Inspect the code again if needed, with
    the same rules as for a new idea.
-2. Write `docs/plans/NNN-name.md` from [plan-template.md](plan-template.md).
-3. Every step names the acceptance criteria it satisfies. Every acceptance
+2. Research only when needed: if the brief has a real technology choice under
+   Options, or an unknown blocks the plan, write `docs/plans/NNN-research.md`
+   from the research format in [plan-template.md](plan-template.md). Link it
+   in the plan and sum up each decision there in one line.
+3. Check current sources for every new dependency and every framework API the
+   plan uses for the first time. Use a documentation tool if one is available
+   (such as Context7), otherwise the official documentation or the package
+   registry. Check the latest stable version, deprecation, maintenance (last
+   release) and that the planned API exists in that version. If no source can
+   be checked: write "Not verified against current docs". Never present
+   versions or APIs from memory as checked.
+4. Write `docs/plans/NNN-name.md` from [plan-template.md](plan-template.md).
+5. Every step names the acceptance criteria it satisfies. Every acceptance
    criterion is covered by at least one step.
-4. Link the plan in the backlog file.
-5. Stop and ask for `/idea approve NNN`.
+6. Link the plan in the backlog file.
+7. Stop and ask for `/idea approve NNN`.
 
 Done when:
 - [ ] The plan file exists and is linked in the backlog file.
 - [ ] Every acceptance criterion is in the Coverage table.
+- [ ] Every new dependency and new API has a source and date, or says it
+      was not verified.
 - [ ] `docs/backlog/.intake-lock` is deleted.
 
 ## Start
@@ -211,7 +224,9 @@ Requires status PLANNED.
 5. If something requires a deviation from the plan that changes scope or
    acceptance criteria: stop and ask.
 6. Never add a dependency that is not in the Dependencies section of the
-   approved plan. If one is needed: stop and ask.
+   approved plan. If one is needed: stop and ask. Install the exact version
+   in the plan. If the check date is more than 30 days old: check the version
+   again first and report any change before you install.
 
 Done when:
 - [ ] Every finished step is checked off and has a step report.

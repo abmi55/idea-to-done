@@ -39,6 +39,7 @@ AI coding agents are fast at writing code. That speed is also the risk. Without 
 - 💡 **Questions with a recommendation.** Every question says why it matters and what the agent recommends. Answer `Q1: rec` to accept it.
 - 🧪 **Independent verification.** `/idea done` checks the code against the brief before anything counts as done. A checked-off step is not evidence. Gaps become new plan steps, typed `missing`, `partial`, `contradicts` or `unrequested`, so scope creep shows up too.
 - 📦 **No surprise dependencies.** Every new dependency is listed in the plan with a reason and a rejected alternative. During `/idea start`, the agent stops and asks before adding one that is not in the approved plan.
+- 📅 **Checked against current docs.** New dependencies and new framework APIs are checked against current documentation or the package registry, with source and date in the plan, so the plan does not rest on outdated training data. A real technology choice gets a short `research.md` with the decision, alternatives and sources.
 - 🔍 **Honest about what was read.** Every brief lists the files that were inspected, and the ones that were not.
 - ⏱️ **Stale-plan check.** `/idea start` uses `git log` to detect changes to affected files since the brief was written.
 - 📥 **Capture without derailing.** Ideas that come up during other work become a two-line backlog file, and the current work continues.
@@ -210,6 +211,7 @@ In each project, the skill creates:
 ```text
 docs/backlog/NNN-name.md   brief, decisions, verification and history
 docs/plans/NNN-name.md     implementation plan
+docs/plans/NNN-research.md research, only for a real technology choice
 ```
 
 ## Limitations
