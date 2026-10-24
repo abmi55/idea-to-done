@@ -41,7 +41,7 @@ AI coding agents are fast at writing code. That speed is also the risk. Without 
 - 📦 **No surprise dependencies.** Every new dependency is listed in the plan with a reason and a rejected alternative. During `/idea start`, the agent stops and asks before adding one that is not in the approved plan.
 - 📅 **Checked against current docs.** New dependencies and new framework APIs are checked against current documentation or the package registry, with source and date in the plan, so the plan does not rest on outdated training data. A real technology choice gets a short `research.md` with the decision, alternatives and sources.
 - 🔍 **Honest about what was read.** Every brief lists the files that were inspected, and the ones that were not.
-- ⏱️ **Stale-plan check.** `/idea start` uses `git log` to detect changes to affected files since the brief was written.
+- ⏱️ **Stale-plan check.** `/idea start` uses `git log` to detect changes to affected files since the brief was written. It records the base commit, and `/idea done` uses it to find every file changed since then.
 - 📥 **Capture without derailing.** Ideas that come up during other work become a two-line backlog file, and the current work continues.
 - 🪶 **Light for small ideas.** A small idea gets a short brief, with `N/A` for sections that do not apply and no subagent.
 - 🌍 **Speaks your language.** Briefs and plans are written in the language you write in, unless your project's `CLAUDE.md` says otherwise.
@@ -162,7 +162,7 @@ Restart Claude Code and type `/idea` to see the help.
 
 ### Hard guarantee (optional, manual install only)
 
-The plugin includes this hook already. By default, "no project files during intake" is an instruction. The hook in `hooks/idea-guard.js` makes it a technical block. While an intake command runs, the skill creates `docs/backlog/.intake-lock`, and the hook blocks Edit, Write and NotebookEdit outside `docs/backlog` and `docs/plans`. Without the lock file, the hook does nothing, so bug fixes and small changes still work. It needs Node, which Claude Code already uses.
+The plugin includes this hook already. By default, "no project files during intake" is an instruction. The hook in `hooks/idea-guard.js` makes it a technical block. While an intake command runs, the skill creates `docs/backlog/.intake-lock`, and the hook blocks Edit, Write and NotebookEdit outside `docs/backlog` and `docs/plans`. The skill deletes the lock when the command ends. If your project keeps intake files in other folders, list them in the lock file, one per line, and the hook allows those too. Without the lock file, the hook does nothing, so bug fixes and small changes still work. It needs Node, which Claude Code already uses.
 
 Copy the hook:
 
