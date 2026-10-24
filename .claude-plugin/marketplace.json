@@ -1,0 +1,8 @@
+{
+  "name": "idea-to-done",
+  "owner": { "name": "Abbas Mirhazar" },
+  "description": "The /idea skill: from first description to verified delivery.",
+  "plugins": [
+    { "name": "idea-to-done", "source": "./" }
+  ]
+}

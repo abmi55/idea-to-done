@@ -111,9 +111,27 @@ Claude creates `docs/backlog/001-csv-export.md` with a full brief and stops. The
 
 ## Install
 
-The skill installs globally and works in every project.
+### As a Claude Code plugin (recommended)
 
-<details open>
+The plugin gives you the skill, the always-on rules and the write guard in one step, and it can update itself.
+
+```text
+/plugin marketplace add abmi55/idea-to-done
+/plugin install idea-to-done@idea-to-done
+```
+
+Restart Claude Code and type `/idea` to see the help. The full name `/idea-to-done:idea` also works, and is needed only if another skill or command is already called `idea`.
+
+**Updates:** turn on automatic updates once in `/plugin` → **Marketplaces** → `idea-to-done` → **Enable auto-update**. Without it, run `/plugin marketplace update idea-to-done` to get the latest version.
+
+> [!IMPORTANT]
+> Did you install by copying files before? Remove `~/.claude/skills/idea`, `~/.claude/rules/idea-intake.md` and the `idea-guard.js` entry in `~/.claude/settings.json`. Otherwise Claude gets two copies of the skill and the rules.
+
+### Manual install
+
+A manual install does not update. Run `git pull` and copy the files again after each release.
+
+<details>
 <summary><b>macOS, Linux or Git Bash</b></summary>
 
 ```bash
@@ -142,9 +160,9 @@ Restart Claude Code and type `/idea` to see the help.
 > [!TIP]
 > If a project's `CLAUDE.md` already has its own idea rules, remove them so Claude does not get two conflicting versions.
 
-### Hard guarantee (optional)
+### Hard guarantee (optional, manual install only)
 
-By default, "no project files during intake" is an instruction. The hook in `hooks/idea-guard.js` makes it a technical block. While an intake command runs, the skill creates `docs/backlog/.intake-lock`, and the hook blocks Edit, Write and NotebookEdit outside `docs/backlog` and `docs/plans`. Without the lock file, the hook does nothing, so bug fixes and small changes still work. It needs Node, which Claude Code already uses.
+The plugin includes this hook already. By default, "no project files during intake" is an instruction. The hook in `hooks/idea-guard.js` makes it a technical block. While an intake command runs, the skill creates `docs/backlog/.intake-lock`, and the hook blocks Edit, Write and NotebookEdit outside `docs/backlog` and `docs/plans`. Without the lock file, the hook does nothing, so bug fixes and small changes still work. It needs Node, which Claude Code already uses.
 
 Copy the hook:
 
@@ -198,8 +216,13 @@ skills/idea/
 ├── brief-checklist.md  quality check and question areas
 ├── plan-template.md    plan format with a coverage table
 └── backlog-format.md   statuses and file format
+.claude-plugin/
+├── plugin.json         plugin manifest
+└── marketplace.json    lets users add this repository as a marketplace
 hooks/
-├── idea-guard.js       optional PreToolUse hook that blocks writes during intake
+├── hooks.json          hook config for the plugin install
+├── session-rules.js    SessionStart hook that loads the always-on rules
+├── idea-guard.js       PreToolUse hook that blocks writes during intake
 └── idea-guard.test.js  tests, run with node --test hooks/idea-guard.test.js
 rules/
 ├── idea-intake.md      always-on rules for Claude Code

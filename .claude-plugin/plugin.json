@@ -1,0 +1,10 @@
+{
+  "name": "idea-to-done",
+  "displayName": "idea-to-done",
+  "description": "Idea intake from first description to verified delivery, with a gate you approve at every step.",
+  "author": { "name": "Abbas Mirhazar" },
+  "homepage": "https://github.com/abmi55/idea-to-done",
+  "repository": "https://github.com/abmi55/idea-to-done",
+  "license": "MIT",
+  "keywords": ["planning", "backlog", "acceptance-criteria", "workflow"]
+}
