@@ -110,7 +110,10 @@ Say so explicitly if the idea:
 - conflicts with the architecture or an earlier decision (search
   `docs/backlog`, `docs/plans` and any ADR or architecture documents),
 - has high cost for low value,
-- is better solved another way.
+- is better solved another way,
+- adds new code where existing code can be reused or extended,
+- needs a new dependency where the standard library or an installed
+  dependency is enough.
 
 Report the conflict and the reasoning. Do not resolve it silently. The
 decision belongs to the user.
@@ -207,6 +210,8 @@ Requires status PLANNED.
    report.
 5. If something requires a deviation from the plan that changes scope or
    acceptance criteria: stop and ask.
+6. Never add a dependency that is not in the Dependencies section of the
+   approved plan. If one is needed: stop and ask.
 
 Done when:
 - [ ] Every finished step is checked off and has a step report.

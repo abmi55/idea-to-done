@@ -34,10 +34,11 @@ AI coding agents are fast at writing code. That speed is also the risk. Without 
 - 🚦 **Explicit gates.** Status changes only through commands like `/idea approve 007`. A chat "ok" never counts, so you always know exactly what you approved.
 - 🔒 **No code before an approved plan.** During intake the agent may read the codebase but writes only the backlog and plan documents.
 - 🔗 **End-to-end traceability.** Questions (`Q1`), assumptions (`A1`) and acceptance criteria (`AC1`) get IDs. Every plan step names the criteria it satisfies, and `/idea done` verifies them one by one, with evidence.
-- 🗣️ **Pushback built in.** The agent says so when an idea duplicates existing functionality, conflicts with the architecture or costs more than it returns. Every brief ends with a verdict: `go`, `needs-clarification` or `kill`. The decision stays yours.
+- 🗣️ **Pushback built in.** The agent says so when an idea duplicates existing functionality, could reuse existing code, needs a dependency it could do without, conflicts with the architecture or costs more than it returns. Every brief ends with a verdict: `go`, `needs-clarification` or `kill`. The decision stays yours.
 - ✅ **Self-checked briefs.** Before you see a brief, the agent checks it against a fixed list: testable Given/When/Then criteria, no vague words, a bounded scope. It fixes what it can and tells you what still fails.
 - 💡 **Questions with a recommendation.** Every question says why it matters and what the agent recommends. Answer `Q1: rec` to accept it.
 - 🧪 **Independent verification.** `/idea done` checks the code against the brief before anything counts as done. A checked-off step is not evidence. Gaps become new plan steps, typed `missing`, `partial`, `contradicts` or `unrequested`, so scope creep shows up too.
+- 📦 **No surprise dependencies.** Every new dependency is listed in the plan with a reason and a rejected alternative. During `/idea start`, the agent stops and asks before adding one that is not in the approved plan.
 - 🔍 **Honest about what was read.** Every brief lists the files that were inspected, and the ones that were not.
 - ⏱️ **Stale-plan check.** `/idea start` uses `git log` to detect changes to affected files since the brief was written.
 - 📥 **Capture without derailing.** Ideas that come up during other work become a two-line backlog file, and the current work continues.

@@ -26,6 +26,11 @@ Created: YYYY-MM-DD
 ## Test strategy
 Which tests are added or changed, and how they run.
 
+## Dependencies
+New dependencies, or "None". Per dependency: name and version, why it is
+needed, and which alternative was rejected (the standard library or an
+installed dependency).
+
 ## Migration and rollback
 Only if relevant. Otherwise "N/A".
 
@@ -36,6 +41,7 @@ Rules:
 - Every step can be verified on its own.
 - Every acceptance criterion appears in the Coverage table.
 - No steps outside the scope of the brief.
+- Every new dependency is listed under Dependencies.
 
 ## Steps added by done
 
