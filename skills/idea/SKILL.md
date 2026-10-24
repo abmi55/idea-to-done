@@ -59,17 +59,19 @@ exist: say so and stop.
 - Status changes only through these commands. "Ok", "sounds good" or similar
   in chat is not an approval. Point to `/idea approve NNN`.
 - Before status PLANNED: do not change project files. The only allowed writes
-  are `docs/backlog/NNN-*.md` and `docs/plans/NNN-*.md`.
+  are `docs/backlog/NNN-*.md`, `docs/plans/NNN-*.md` and the intake lock.
 - Never implement during intake, even if the idea seems small or obvious.
 - Never present guesses as findings. State explicitly what was not inspected.
 - On every status change: add a line under History in the backlog file (date,
   new status, command).
 - Intake lock: New idea, Answer and Plan create the empty file
-  `docs/backlog/.intake-lock` as their first write and delete it as their
-  last action, also when they stop early. If the project uses other folders
-  than `docs/backlog` and `docs/plans`, write those folders in the lock file,
-  one per line. The optional hook in `hooks/idea-guard.js` uses the file to
-  block other writes.
+  `.idea-intake.lock` in the project root as their first write and delete it
+  as their last action, also when they stop early. If the project uses other
+  folders than `docs/backlog` and `docs/plans`, write those folders in the
+  lock file, one per line. The optional hook in `hooks/idea-guard.js` uses
+  the file to block other writes, and ignores a lock older than 2 hours.
+- If the hook blocks a write: stop and tell the user what was blocked. Never
+  delete the lock file to get past the block.
 
 File format and statuses: see [backlog-format.md](backlog-format.md).
 
@@ -101,7 +103,7 @@ Done when:
 - [ ] The backlog file exists with status IDEA and a History line.
 - [ ] The quality check ran and its result is in the reply.
 - [ ] The Challenge section ends with a verdict.
-- [ ] `docs/backlog/.intake-lock` is deleted.
+- [ ] `.idea-intake.lock` is deleted.
 
 ## Challenge the idea
 
@@ -159,7 +161,7 @@ Done when:
 - [ ] Every answer is under Decisions as text.
 - [ ] No answered question is still open.
 - [ ] The quality check ran and its result is in the reply.
-- [ ] `docs/backlog/.intake-lock` is deleted.
+- [ ] `.idea-intake.lock` is deleted.
 
 ## Approve
 
@@ -204,11 +206,16 @@ Done when:
 - [ ] Every acceptance criterion is in the Coverage table.
 - [ ] Every new dependency and new API has a source and date, or says it
       was not verified.
-- [ ] `docs/backlog/.intake-lock` is deleted.
+- [ ] `.idea-intake.lock` is deleted.
 
 ## Start
 
-Requires status PLANNED.
+Requires status PLANNED, or IN PROGRESS to resume.
+
+If the status is IN PROGRESS: skip steps 1 and 2 and keep the base hash in
+the History. Continue with the first step that is not checked off, including
+steps added by `/idea done`. Then follow steps 3–6.
+
 1. Check whether the brief is stale. If the project is a git repository: run
    `git log --since=<brief date> --name-only` and compare with the files in
    the impact analysis and the plan. If affected files have changed: report
@@ -230,7 +237,8 @@ Requires status PLANNED.
 
 Done when:
 - [ ] Every finished step is checked off and has a step report.
-- [ ] The History line has the base hash, if the project uses git.
+- [ ] The History line from the first start has the base hash, if the
+      project uses git. A resume adds no new base hash.
 
 ## Done
 

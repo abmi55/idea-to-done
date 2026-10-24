@@ -9,7 +9,7 @@ Location: `docs/backlog/NNN-name.md`, one file per idea. NNN has three digits.
 | IDEA | New or being refined | `answer`, `approve` |
 | REFINED | Brief approved | `plan`, then `approve` |
 | PLANNED | Plan approved | `start` |
-| IN PROGRESS | Being implemented | `done` |
+| IN PROGRESS | Being implemented | `start` (resume), `done` |
 | DONE | All acceptance criteria verified | – |
 | DROPPED | Cancelled, reason recorded | – |
 | SPLIT | Divided into separate backlog files | (the parts' commands) |

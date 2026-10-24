@@ -87,7 +87,7 @@ Any status except `DONE` can be dropped with `/idea drop`. An idea that is too l
 | `/idea answer NNN <answers>` | `IDEA` | Records your answers and updates the brief |
 | `/idea approve NNN` | `IDEA` / `REFINED` | Approves the brief or the plan |
 | `/idea plan NNN` | `REFINED` | Writes the implementation plan |
-| `/idea start NNN` | `PLANNED` | Checks for stale files, then implements step by step |
+| `/idea start NNN` | `PLANNED` / `IN PROGRESS` | Checks for stale files, then implements step by step. On `IN PROGRESS`, continues with the steps not yet checked off, such as gaps found by `done` |
 | `/idea done NNN` | `IN PROGRESS` | Checks the code against the brief, then verifies every acceptance criterion |
 | `/idea drop NNN <reason>` | any except `DONE` | Cancels the idea and records why |
 | `/idea list` | – | Shows the backlog |
@@ -162,7 +162,13 @@ Restart Claude Code and type `/idea` to see the help.
 
 ### Hard guarantee (optional, manual install only)
 
-The plugin includes this hook already. By default, "no project files during intake" is an instruction. The hook in `hooks/idea-guard.js` makes it a technical block. While an intake command runs, the skill creates `docs/backlog/.intake-lock`, and the hook blocks Edit, Write and NotebookEdit outside `docs/backlog` and `docs/plans`. The skill deletes the lock when the command ends. If your project keeps intake files in other folders, list them in the lock file, one per line, and the hook allows those too. Without the lock file, the hook does nothing, so bug fixes and small changes still work. It needs Node, which Claude Code already uses.
+The plugin includes this hook already. By default, "no project files during intake" is an instruction. The hook in `hooks/idea-guard.js` makes it a technical block. While an intake command runs, the skill creates `.idea-intake.lock` in the project root. The hook then blocks writes outside `docs/backlog` and `docs/plans`:
+
+- every Edit, Write and NotebookEdit,
+- Bash and PowerShell commands that write files, such as `>` redirects, `sed -i`, `rm`, `mv`, `cp`, `Set-Content` and `Remove-Item`,
+- package installs and git commands that change files, such as `npm install` and `git checkout`.
+
+The skill deletes the lock when the command ends. A lock older than 2 hours counts as left over from an interrupted command, and the hook ignores it. If your project keeps intake files in other folders, list them in the lock file, one per line, and the hook allows only those. Without the lock file, the hook does nothing, so bug fixes and small changes still work. It needs Node, which Claude Code already uses.
 
 Copy the hook:
 
@@ -183,7 +189,7 @@ Then add it to `~/.claude/settings.json`:
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Edit|Write|NotebookEdit",
+        "matcher": "Edit|Write|NotebookEdit|Bash|PowerShell",
         "hooks": [{ "type": "command", "command": "node ~/.claude/hooks/idea-guard.js" }]
       }
     ]
@@ -191,7 +197,7 @@ Then add it to `~/.claude/settings.json`:
 }
 ```
 
-Add `docs/backlog/.intake-lock` to each project's `.gitignore`.
+Add `.idea-intake.lock` to each project's `.gitignore`.
 
 ## Compatibility
 
@@ -240,8 +246,8 @@ docs/plans/NNN-research.md research, only for a real technology choice
 ## Limitations
 
 - Without the optional hook, "do not write project files during intake" is an instruction, not a technical block.
-- The hook blocks Edit, Write and NotebookEdit only. File writes through shell commands, such as `sed -i`, are not blocked.
-- If an intake command is interrupted, the lock file can stay behind and block all edits. Delete `docs/backlog/.intake-lock` to unlock.
+- The shell check in the hook recognizes common commands. It is not a sandbox: a write through a script, such as `python -c` or `node -e`, or through a command it does not know, is not blocked.
+- If an intake command is interrupted, the lock file stays behind for up to 2 hours and blocks edits. Delete `.idea-intake.lock` to unlock sooner.
 - The stale-plan check needs the project to be a git repository.
 - The skill sets `disable-model-invocation: true`. Claude never starts it on its own, only you can, with `/idea`.
 
