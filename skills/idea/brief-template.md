@@ -11,15 +11,29 @@ What it solves, for whom, and how we know it worked.
 What you understood, in your own words.
 
 ## 3. Open questions
-Q1 … Q5, at most five.
+Q1 … Q5, at most five. Each question has this form:
+
+```markdown
+- Q1: <A full question that ends with a question mark?>
+  Why: <one sentence on what the answer changes>
+  Recommendation: <your answer> – <one sentence on why>
+  Options: A) … B) … C) … (only when there are real alternatives)
+```
 
 ### Assumptions
 A1, A2 … Every assumption the user can correct.
 
+### Deferred
+Questions that did not fit within the five, each with one line on why it can
+wait. "None" if empty.
+
 ## 4. Acceptance criteria
-Observable conditions for "done". One per line, with an ID:
-- AC1: …
-- AC2: …
+Observable conditions for "done". One per line, with an ID. Write criteria
+that describe behavior as Given/When/Then. Criteria that do not describe
+behavior may use free form.
+- AC1: Given a signed-in user with two listings, When they click Export, Then
+  a CSV file with two rows and a header row is downloaded.
+- AC2: The README describes the export under Features.
 
 ## 5. Out of scope
 
@@ -49,4 +63,8 @@ parts that can be delivered independently, with reasoning.
 
 ## Challenge
 Conflicts with existing functionality, architecture or earlier decisions, or
-"None found".
+"None found". End with:
+
+```markdown
+Verdict: go | needs-clarification | kill – <one sentence on why>
+```

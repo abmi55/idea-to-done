@@ -34,7 +34,10 @@ AI coding agents are fast at writing code. That speed is also the risk. Without 
 - 🚦 **Explicit gates.** Status changes only through commands like `/idea approve 007`. A chat "ok" never counts, so you always know exactly what you approved.
 - 🔒 **No code before an approved plan.** During intake the agent may read the codebase but writes only the backlog and plan documents.
 - 🔗 **End-to-end traceability.** Questions (`Q1`), assumptions (`A1`) and acceptance criteria (`AC1`) get IDs. Every plan step names the criteria it satisfies, and `/idea done` verifies them one by one, with evidence.
-- 🗣️ **Pushback built in.** The agent says so when an idea duplicates existing functionality, conflicts with the architecture or costs more than it returns. The decision stays yours.
+- 🗣️ **Pushback built in.** The agent says so when an idea duplicates existing functionality, conflicts with the architecture or costs more than it returns. Every brief ends with a verdict: `go`, `needs-clarification` or `kill`. The decision stays yours.
+- ✅ **Self-checked briefs.** Before you see a brief, the agent checks it against a fixed list: testable Given/When/Then criteria, no vague words, a bounded scope. It fixes what it can and tells you what still fails.
+- 💡 **Questions with a recommendation.** Every question says why it matters and what the agent recommends. Answer `Q1: rec` to accept it.
+- 🧪 **Independent verification.** `/idea done` checks the code against the brief before anything counts as done. A checked-off step is not evidence. Gaps become new plan steps, typed `missing`, `partial`, `contradicts` or `unrequested`, so scope creep shows up too.
 - 🔍 **Honest about what was read.** Every brief lists the files that were inspected, and the ones that were not.
 - ⏱️ **Stale-plan check.** `/idea start` uses `git log` to detect changes to affected files since the brief was written.
 - 📥 **Capture without derailing.** Ideas that come up during other work become a two-line backlog file, and the current work continues.
@@ -65,8 +68,8 @@ Any status except `DONE` can be dropped with `/idea drop`. An idea that is too l
 
 1. **Problem:** what it solves, for whom, and how we know it worked
 2. **Restated scope** in the agent's own words
-3. **Open questions:** at most five, plus numbered assumptions you can correct
-4. **Acceptance criteria:** observable conditions for "done"
+3. **Open questions:** at most five, each with a recommendation, plus numbered assumptions you can correct
+4. **Acceptance criteria:** observable conditions for "done", written as Given/When/Then
 5. **Out of scope**
 6. **Edge cases and non-functional concerns:** errors, empty states, permissions, performance, security, privacy, backwards compatibility
 7. **Impact analysis:** affected modules, files, data models and APIs, plus a list of inspected files
@@ -83,7 +86,7 @@ Any status except `DONE` can be dropped with `/idea drop`. An idea that is too l
 | `/idea approve NNN` | `IDEA` / `REFINED` | Approves the brief or the plan |
 | `/idea plan NNN` | `REFINED` | Writes the implementation plan |
 | `/idea start NNN` | `PLANNED` | Checks for stale files, then implements step by step |
-| `/idea done NNN` | `IN PROGRESS` | Verifies every acceptance criterion |
+| `/idea done NNN` | `IN PROGRESS` | Checks the code against the brief, then verifies every acceptance criterion |
 | `/idea drop NNN <reason>` | any except `DONE` | Cancels the idea and records why |
 | `/idea list` | – | Shows the backlog |
 
@@ -96,7 +99,7 @@ Any status except `DONE` can be dropped with `/idea drop`. An idea that is too l
 Claude creates `docs/backlog/001-csv-export.md` with a full brief and stops. Then:
 
 ```text
-/idea answer 001 Q1: own listings only, Q2: semicolon as separator
+/idea answer 001 Q1: own listings only, Q2: rec
 /idea approve 001
 /idea plan 001
 /idea approve 001
@@ -137,6 +140,39 @@ Restart Claude Code and type `/idea` to see the help.
 > [!TIP]
 > If a project's `CLAUDE.md` already has its own idea rules, remove them so Claude does not get two conflicting versions.
 
+### Hard guarantee (optional)
+
+By default, "no project files during intake" is an instruction. The hook in `hooks/idea-guard.js` makes it a technical block. While an intake command runs, the skill creates `docs/backlog/.intake-lock`, and the hook blocks Edit, Write and NotebookEdit outside `docs/backlog` and `docs/plans`. Without the lock file, the hook does nothing, so bug fixes and small changes still work. It needs Node, which Claude Code already uses.
+
+Copy the hook:
+
+```bash
+mkdir -p ~/.claude/hooks
+cp idea-to-done/hooks/idea-guard.js ~/.claude/hooks/
+```
+
+```powershell
+New-Item -ItemType Directory -Force $HOME\.claude\hooks | Out-Null
+Copy-Item idea-to-done\hooks\idea-guard.js $HOME\.claude\hooks\
+```
+
+Then add it to `~/.claude/settings.json`:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [{ "type": "command", "command": "node ~/.claude/hooks/idea-guard.js" }]
+      }
+    ]
+  }
+}
+```
+
+Add `docs/backlog/.intake-lock` to each project's `.gitignore`.
+
 ## Compatibility
 
 `/idea` is built and tested for **Claude Code**. The skill follows the open [Agent Skills](https://agentskills.io) format (`SKILL.md`), so other tools that support the format, such as OpenAI Codex, GitHub Copilot, Gemini CLI or Cursor, can likely load it too. These tools are not tested.
@@ -157,8 +193,12 @@ Restart Claude Code and type `/idea` to see the help.
 skills/idea/
 ├── SKILL.md            modes, gates and rules
 ├── brief-template.md   the ten brief sections
+├── brief-checklist.md  quality check and question areas
 ├── plan-template.md    plan format with a coverage table
 └── backlog-format.md   statuses and file format
+hooks/
+├── idea-guard.js       optional PreToolUse hook that blocks writes during intake
+└── idea-guard.test.js  tests, run with node --test hooks/idea-guard.test.js
 rules/
 ├── idea-intake.md      always-on rules for Claude Code
 └── AGENTS.md           the same rules for tools that read AGENTS.md
@@ -173,7 +213,9 @@ docs/plans/NNN-name.md     implementation plan
 
 ## Limitations
 
-- "Do not write project files during intake" is an instruction, not a technical block. Claude follows it, but you can add a `PreToolUse` hook that blocks file edits outside `docs/` if you want a hard guarantee.
+- Without the optional hook, "do not write project files during intake" is an instruction, not a technical block.
+- The hook blocks Edit, Write and NotebookEdit only. File writes through shell commands, such as `sed -i`, are not blocked.
+- If an intake command is interrupted, the lock file can stay behind and block all edits. Delete `docs/backlog/.intake-lock` to unlock.
 - The stale-plan check needs the project to be a git repository.
 - The skill sets `disable-model-invocation: true`. Claude never starts it on its own, only you can, with `/idea`.
 

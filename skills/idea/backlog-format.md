@@ -37,7 +37,11 @@ Parts: –
 
 ## History
 - YYYY-MM-DD IDEA (/idea)
+- YYYY-MM-DD IN PROGRESS (/idea start NNN) base: <git commit hash>
 ```
+
+The base hash is written only in git repositories. `/idea done` uses it to
+find changed files.
 
 ## Short file for ideas found during other work
 

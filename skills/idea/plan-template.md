@@ -36,3 +36,14 @@ Rules:
 - Every step can be verified on its own.
 - Every acceptance criterion appears in the Coverage table.
 - No steps outside the scope of the brief.
+
+## Steps added by done
+
+`/idea done` adds one step per finding at the end of the Steps list. It never
+changes, reorders or renumbers existing steps:
+
+```markdown
+- [ ] S7: Add the empty-state message to the export page.
+  Finding: missing, AC3
+  Evidence: src/export/page.tsx has no branch for zero listings.
+```
