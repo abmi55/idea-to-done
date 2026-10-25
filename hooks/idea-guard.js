@@ -1,16 +1,15 @@
 #!/usr/bin/env node
-// PreToolUse hook for the /idea skill. While .idea-intake.lock exists in the
-// project root, it blocks file writes outside the allowed folders: every
-// Edit, Write and NotebookEdit, and Bash or PowerShell commands that look like
-// file writes. The shell check covers common commands; it is not a sandbox.
+// PreToolUse hook for the /idea skill. While docs/backlog/.intake-lock exists,
+// it blocks file writes outside the allowed folders: every Edit, Write and
+// NotebookEdit, and Bash or PowerShell commands that look like file writes. The shell check covers common commands; it is not a sandbox.
 // A lock older than MAX_LOCK_AGE_MS is treated as left over and ignored.
 // Exit 2 blocks the tool call, exit 0 lets the normal permission flow decide.
 
 const fs = require("node:fs");
 const path = require("node:path");
 
-const LOCK_NAME = ".idea-intake.lock";
-const DEFAULT_ALLOWED = [path.join("docs", "backlog"), path.join("docs", "plans")];
+const LOCK_FILE = "docs/backlog/.intake-lock";
+const DEFAULT_ALLOWED = [path.join("docs", "backlog")];
 const MAX_LOCK_AGE_MS = 2 * 60 * 60 * 1000;
 
 const FILE_TOOLS = new Set(["Edit", "Write", "NotebookEdit"]);
@@ -272,7 +271,7 @@ const toolTargets = (toolName, toolInput) => {
 // Returns the descriptions of the blocked writes, or an empty list.
 const findBlocked = (input, env) => {
   const projectDir = env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd();
-  const lockPath = path.resolve(projectDir, LOCK_NAME);
+  const lockPath = path.resolve(projectDir, LOCK_FILE);
   const lock = readActiveLock(lockPath);
   if (!lock) return [];
 
@@ -302,7 +301,7 @@ const main = () => {
   if (blocked.length > 0) {
     process.stderr.write(
       `idea intake is running: only the intake folders may change. Blocked: ${blocked.join(", ")}. ` +
-        `Do not delete ${LOCK_NAME} to get past this. Stop and tell the user; ` +
+        `Do not delete ${LOCK_FILE} to get past this. Stop and tell the user; ` +
         "the user deletes the lock if no /idea command is running.\n",
     );
     process.exit(2);
