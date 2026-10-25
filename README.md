@@ -8,7 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Status](https://img.shields.io/badge/status-stable-brightgreen)
 
-[Why](#why) · [Features](#features) · [Workflow](#workflow) · [Commands](#commands) · [Install](#install) · [Compatibility](#compatibility) · [Limitations](#limitations)
+[Why](#why) · [Features](#features) · [Workflow](#workflow) · [Commands](#commands) · [Files and git](#files-and-git) · [Install](#install) · [Compatibility](#compatibility) · [Limitations](#limitations)
 
 </div>
 
@@ -32,7 +32,7 @@ AI coding agents are fast at writing code. That speed is also the risk. Without 
 ## Features
 
 - 🚦 **Explicit gates.** Status changes only through commands like `/idea approve 007`. A chat "ok" never counts, so you always know exactly what you approved.
-- 🔒 **No code before an approved plan.** During intake the agent may read the codebase but writes only the backlog and plan documents.
+- 🔒 **No code before an approved plan.** During intake the agent may read the codebase but writes only to `docs/backlog/`.
 - 🔗 **End-to-end traceability.** Questions (`Q1`), assumptions (`A1`) and acceptance criteria (`AC1`) get IDs. Every plan step names the criteria it satisfies, and `/idea done` verifies them one by one, with evidence.
 - 🗣️ **Pushback built in.** The agent says so when an idea duplicates existing functionality, could reuse existing code, needs a dependency it could do without, conflicts with the architecture or costs more than it returns. Every brief ends with a verdict: `go`, `needs-clarification` or `kill`. The decision stays yours.
 - ✅ **Self-checked briefs.** Before you see a brief, the agent checks it against a fixed list: testable Given/When/Then criteria, no vague words, a bounded scope. It fixes what it can and tells you what still fails.
@@ -42,10 +42,12 @@ AI coding agents are fast at writing code. That speed is also the risk. Without 
 - 📅 **Checked against current docs.** New dependencies and new framework APIs are checked against current documentation or the package registry, with source and date in the plan, so the plan does not rest on outdated training data. A real technology choice gets a short `research.md` with the decision, alternatives and sources.
 - 🔍 **Honest about what was read.** Every brief lists the files that were inspected, and the ones that were not.
 - ⏱️ **Stale-plan check.** `/idea start` uses `git log` to detect changes to affected files since the brief was written. It records the base commit, and `/idea done` uses it to find every file changed since then.
-- 📥 **Capture without derailing.** Ideas that come up during other work become a two-line backlog file, and the current work continues.
+- 📥 **Capture without derailing.** Ideas that come up during other work become a two-line task in the queue, and the current work continues.
+- 📋 **One register.** `docs/backlog/status.md` shows what is in progress now, where the work left off, what is queued and what is done. Only one task is in progress at a time.
+- 🔐 **Private planning, public results.** Briefs and plans stay out of git. When a task is done, the skill writes a `CHANGELOG.md` line and a short decision record that are committed with the code.
 - 🪶 **Light for small ideas.** A small idea gets a short brief, with `N/A` for sections that do not apply and no subagent.
 - 🌍 **Speaks your language.** Briefs and plans are written in the language you write in, unless your project's `CLAUDE.md` says otherwise.
-- 🧠 **Context-friendly.** The full process loads only when you run `/idea`. Only four always-on rules live in your global configuration.
+- 🧠 **Context-friendly.** The full process loads only when you run `/idea`. Only a short list of always-on rules lives in your global configuration.
 
 ## Workflow
 
@@ -64,7 +66,7 @@ Any status except `DONE` can be dropped with `/idea drop`. An idea that is too l
 | `IN PROGRESS` | Being implemented |
 | `DONE` | All acceptance criteria verified |
 | `DROPPED` | Cancelled, reason recorded |
-| `SPLIT` | Divided into smaller parts, each with its own backlog file |
+| `SPLIT` | Divided into smaller parts, each with its own task folder |
 
 ### What a brief contains
 
@@ -79,18 +81,20 @@ Any status except `DONE` can be dropped with `/idea drop`. An idea that is too l
 9. **Risks and dependencies:** migrations, breaking changes, anything hard to undo
 10. **Size:** a proposed split if the work cannot be delivered and verified as one unit
 
+When you approve the brief, the skill adds **Approved behavior**: what the work does and what is out of scope. The plan and `/idea done` check against it.
+
 ## Commands
 
 | Command | Requires | Does |
 |---|---|---|
-| `/idea <description>` | – | Reads the code, creates a backlog file and writes the brief |
+| `/idea <description>` | – | Reads the code, creates a task folder and writes the brief |
 | `/idea answer NNN <answers>` | `IDEA` | Records your answers and updates the brief |
-| `/idea approve NNN` | `IDEA` / `REFINED` | Approves the brief or the plan |
+| `/idea approve NNN` | `IDEA` / `REFINED` | Approves the brief, and records the approved behavior, or approves the plan |
 | `/idea plan NNN` | `REFINED` | Writes the implementation plan |
-| `/idea start NNN` | `PLANNED` / `IN PROGRESS` | Checks for stale files, then implements step by step. On `IN PROGRESS`, continues with the steps not yet checked off, such as gaps found by `done` |
-| `/idea done NNN` | `IN PROGRESS` | Checks the code against the brief, then verifies every acceptance criterion |
+| `/idea start NNN` | `PLANNED` / `IN PROGRESS` | Moves the task to Now, checks for stale files, then implements step by step and records where it left off. On `IN PROGRESS`, continues with the steps not yet checked off, such as gaps found by `done` |
+| `/idea done NNN` | `IN PROGRESS` | Checks the code against the brief, verifies every acceptance criterion, then writes the changelog line and the decision record |
 | `/idea drop NNN <reason>` | any except `DONE` | Cancels the idea and records why |
-| `/idea list` | – | Shows the backlog |
+| `/idea list` | – | Shows the register and reports where it disagrees with the task folders |
 
 ### Example
 
@@ -98,7 +102,7 @@ Any status except `DONE` can be dropped with `/idea drop`. An idea that is too l
 /idea Users should be able to export their listings as CSV
 ```
 
-Claude creates `docs/backlog/001-csv-export.md` with a full brief and stops. Then:
+Claude creates `docs/backlog/001-csv-export/discussion.md` with a full brief, adds the task to `docs/backlog/status.md` and stops. Then:
 
 ```text
 /idea answer 001 Q1: own listings only, Q2: rec
@@ -107,6 +111,47 @@ Claude creates `docs/backlog/001-csv-export.md` with a full brief and stops. The
 /idea approve 001
 /idea start 001
 /idea done 001
+```
+
+## Files and git
+
+In each project, the skill creates:
+
+```text
+docs/backlog/                 private planning, not committed
+├── status.md                 register: Now (with "Left off:"), Queue, Done, Paused/Dropped
+└── NNN-name/
+    ├── discussion.md         brief, decisions, approved behavior, verification and history
+    ├── research.md           only for a real technology choice
+    └── plan.md               implementation plan
+docs/decisions/NNN-name.md    public record of what was built and why, written by done
+CHANGELOG.md                  public, one line per done task under Unreleased
+```
+
+**Planning is private. Delivered work and its reasons are public.**
+
+- `docs/backlog/` holds briefs, questions and plans. The skill never commits it. On the first `/idea` in a project, it checks whether `docs/backlog/` is in `.gitignore`, and recommends adding it if not. It does not edit `.gitignore` without asking.
+- When `/idea done` sets a task to `DONE`, it writes a line in `CHANGELOG.md` in the [Keep a Changelog](https://keepachangelog.com) format, under Unreleased, grouped as Added, Changed, Fixed or Removed. It creates the file if it is missing.
+- It also writes `docs/decisions/NNN-name.md`: Summary, Why, Decisions (the chosen option and the rejected ones, one line each), Behavior and a short Verification. No open questions, history or plan steps.
+- Both public files are written in the project's language.
+
+### Project overrides
+
+The project's `CLAUDE.md` (or `AGENTS.md`) takes precedence over the skill for paths, language and conventions. A project can override these paths:
+
+| Path | Default |
+|---|---|
+| Backlog folder | `docs/backlog` |
+| Decisions folder | `docs/decisions` |
+| Changelog file | `CHANGELOG.md` |
+
+For example:
+
+```markdown
+## Idea process
+- Backlog folder: planning/backlog
+- Decisions folder: docs/adr
+- Changelog file: docs/CHANGES.md
 ```
 
 ## Install
@@ -162,13 +207,13 @@ Restart Claude Code and type `/idea` to see the help.
 
 ### Hard guarantee (optional, manual install only)
 
-The plugin includes this hook already. By default, "no project files during intake" is an instruction. The hook in `hooks/idea-guard.js` makes it a technical block. While an intake command runs, the skill creates `.idea-intake.lock` in the project root. The hook then blocks writes outside `docs/backlog` and `docs/plans`:
+The plugin includes this hook already. By default, "no project files during intake" is an instruction. The hook in `hooks/idea-guard.js` makes it a technical block. While an intake command runs, the skill creates `docs/backlog/.intake-lock`. The hook then blocks writes outside `docs/backlog/`:
 
 - every Edit, Write and NotebookEdit,
 - Bash and PowerShell commands that write files, such as `>` redirects, `sed -i`, `rm`, `mv`, `cp`, `Set-Content` and `Remove-Item`,
 - package installs and git commands that change files, such as `npm install` and `git checkout`.
 
-The skill deletes the lock when the command ends. A lock older than 2 hours counts as left over from an interrupted command, and the hook ignores it. If your project keeps intake files in other folders, list them in the lock file, one per line, and the hook allows only those. Without the lock file, the hook does nothing, so bug fixes and small changes still work. It needs Node, which Claude Code already uses.
+The skill deletes the lock when the command ends. A lock older than 2 hours counts as left over from an interrupted command, and the hook ignores it. If your project uses another backlog folder, the skill still creates the lock at `docs/backlog/.intake-lock` and lists the project's folder in it, and the hook allows only the listed folders. Without the lock file, the hook does nothing, so bug fixes and small changes still work. It needs Node, which Claude Code already uses.
 
 Copy the hook:
 
@@ -197,7 +242,7 @@ Then add it to `~/.claude/settings.json`:
 }
 ```
 
-Add `.idea-intake.lock` to each project's `.gitignore`.
+Add `docs/backlog/` to each project's `.gitignore`. That also covers the lock file.
 
 ## Compatibility
 
@@ -217,11 +262,12 @@ Add `.idea-intake.lock` to each project's `.gitignore`.
 
 ```text
 skills/idea/
-├── SKILL.md            modes, gates and rules
-├── brief-template.md   the ten brief sections
-├── brief-checklist.md  quality check and question areas
-├── plan-template.md    plan format with a coverage table
-└── backlog-format.md   statuses and file format
+├── SKILL.md                modes, gates and rules
+├── discussion-template.md  the ten brief sections and approved behavior
+├── brief-checklist.md      quality check and question areas
+├── plan-template.md        plan format with a coverage table
+├── decision-template.md    decision record and changelog line, written by done
+└── backlog-format.md       statuses, task folders and the status register
 .claude-plugin/
 ├── plugin.json         plugin manifest
 └── marketplace.json    lets users add this repository as a marketplace
@@ -235,19 +281,14 @@ rules/
 └── AGENTS.md           the same rules for tools that read AGENTS.md
 ```
 
-In each project, the skill creates:
-
-```text
-docs/backlog/NNN-name.md   brief, decisions, verification and history
-docs/plans/NNN-name.md     implementation plan
-docs/plans/NNN-research.md research, only for a real technology choice
-```
+See [Files and git](#files-and-git) for the files the skill creates in each project.
 
 ## Limitations
 
 - Without the optional hook, "do not write project files during intake" is an instruction, not a technical block.
 - The shell check in the hook recognizes common commands. It is not a sandbox: a write through a script, such as `python -c` or `node -e`, or through a command it does not know, is not blocked.
-- If an intake command is interrupted, the lock file stays behind for up to 2 hours and blocks edits. Delete `.idea-intake.lock` to unlock sooner.
+- If an intake command is interrupted, the lock file stays behind for up to 2 hours and blocks edits. Delete `docs/backlog/.intake-lock` to unlock sooner.
+- The hook looks for the lock only at `docs/backlog/.intake-lock`, also when the project uses another backlog folder.
 - The stale-plan check needs the project to be a git repository.
 - The skill sets `disable-model-invocation: true`. Claude never starts it on its own, only you can, with `/idea`.
 

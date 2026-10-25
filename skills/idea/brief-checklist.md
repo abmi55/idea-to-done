@@ -2,7 +2,7 @@
 
 Run this list against the brief after you write or update it. Every item is a
 yes/no question. Fix the brief and run the list again, at most 3 rounds. Report
-the items that still fail in chat, not in the backlog file.
+the items that still fail in chat, not in `discussion.md`.
 
 A lite brief skips the items marked (full).
 

@@ -10,10 +10,12 @@ The process for ideas lives in the `idea` skill. These rules always apply:
   change of a few lines (text, rename, config value), or when the user writes
   "skip intake".
 - Ideas that come up during other work are never started. Create
-  `docs/backlog/NNN-name.md` with status IDEA and 1–2 lines, continue the
-  current step and mention the idea in the step report.
+  `docs/backlog/NNN-name/discussion.md` with status IDEA and 1–2 lines, add
+  it to Queue in `docs/backlog/status.md`, continue the current step and
+  mention the idea in the step report.
 - Never implement a backlog item that does not have status PLANNED or IN
   PROGRESS.
+- Never commit or stage files in `docs/backlog/`. Planning is private.
 - Project instructions (CLAUDE.md, AGENTS.md) take precedence over these
   rules for paths, language, conventions and tooling. If the project defines
   its own idea or planning process, follow the project, mention the overlap

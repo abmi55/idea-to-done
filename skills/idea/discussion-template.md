@@ -1,8 +1,8 @@
-# Brief template
+# Discussion template
 
-Keep each point as short as the idea allows. A section that does not apply is
-written as "N/A" on one line. A lite brief (small idea) may have N/A in
-sections 6–10.
+The brief in `docs/backlog/NNN-name/discussion.md`. Keep each point as short
+as the idea allows. A section that does not apply is written as "N/A" on one
+line. A lite brief (small idea) may have N/A in sections 6–10.
 
 ## 1. Problem
 What it solves, for whom, and how we know it worked.
@@ -68,3 +68,14 @@ Conflicts with existing functionality, architecture or earlier decisions, or
 ```markdown
 Verdict: go | needs-clarification | kill – <one sentence on why>
 ```
+
+## Approved behavior
+Written by `/idea approve NNN` when the status goes from IDEA to REFINED.
+Before that: "–". It is the reference for the plan and for `/idea done`.
+
+### Behavior
+What the delivered work does, in a few short lines, based on the acceptance
+criteria and the decisions.
+
+### Out of scope
+What it does not do, taken from section 5 and the decisions.

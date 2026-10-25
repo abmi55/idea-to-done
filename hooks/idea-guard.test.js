@@ -6,13 +6,13 @@ const path = require("node:path");
 const { spawnSync } = require("node:child_process");
 
 const HOOK = path.join(__dirname, "idea-guard.js");
-const LOCK_NAME = ".idea-intake.lock";
+const LOCK_FILE = "docs/backlog/.intake-lock";
 
 const makeProject = ({ locked, lockContent = "" }) => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "idea-guard-"));
   fs.mkdirSync(path.join(dir, "docs", "backlog"), { recursive: true });
   fs.mkdirSync(path.join(dir, "src"), { recursive: true });
-  if (locked) fs.writeFileSync(path.join(dir, LOCK_NAME), lockContent);
+  if (locked) fs.writeFileSync(path.join(dir, LOCK_FILE), lockContent);
   return dir;
 };
 
@@ -35,23 +35,31 @@ test("blocks a source file while the lock exists", () => {
   const result = runHook(writeCall(dir, "src/x.ts"));
   assert.strictEqual(result.status, 2);
   assert.match(result.stderr, /idea intake is running/);
-  assert.match(result.stderr, /Do not delete \.idea-intake\.lock/);
+  assert.match(result.stderr, /Do not delete docs\/backlog\/\.intake-lock/);
 });
 
-test("allows a backlog file while the lock exists", () => {
+test("allows files in a task folder and the register while the lock exists", () => {
   const dir = makeProject({ locked: true });
-  assert.strictEqual(runHook(writeCall(dir, "docs/backlog/001-x.md")).status, 0);
+  assert.strictEqual(runHook(writeCall(dir, "docs/backlog/001-x/discussion.md")).status, 0);
+  assert.strictEqual(runHook(writeCall(dir, "docs/backlog/001-x/research.md")).status, 0);
+  assert.strictEqual(runHook(writeCall(dir, "docs/backlog/status.md")).status, 0);
 });
 
 test("allows a plan file given as an absolute path while the lock exists", () => {
   const dir = makeProject({ locked: true });
-  const absolute = path.join(dir, "docs", "plans", "001-x.md");
+  const absolute = path.join(dir, "docs", "backlog", "001-x", "plan.md");
   assert.strictEqual(runHook(writeCall(dir, absolute)).status, 0);
+});
+
+test("blocks the old docs/plans folder and docs/decisions while the lock exists", () => {
+  const dir = makeProject({ locked: true });
+  assert.strictEqual(runHook(writeCall(dir, "docs/plans/001-x.md")).status, 2);
+  assert.strictEqual(runHook(writeCall(dir, "docs/decisions/001-x.md")).status, 2);
 });
 
 test("allows writing the lock file itself", () => {
   const dir = makeProject({ locked: true });
-  assert.strictEqual(runHook(writeCall(dir, LOCK_NAME)).status, 0);
+  assert.strictEqual(runHook(writeCall(dir, LOCK_FILE)).status, 0);
 });
 
 test("allows any file without the lock", () => {
@@ -59,9 +67,9 @@ test("allows any file without the lock", () => {
   assert.strictEqual(runHook(writeCall(dir, "src/x.ts")).status, 0);
 });
 
-test("ignores the old lock path in docs/backlog", () => {
+test("ignores the old lock path in the project root", () => {
   const dir = makeProject({ locked: false });
-  fs.writeFileSync(path.join(dir, "docs", "backlog", ".intake-lock"), "");
+  fs.writeFileSync(path.join(dir, ".idea-intake.lock"), "");
   assert.strictEqual(runHook(writeCall(dir, "src/x.ts")).status, 0);
 });
 
@@ -80,8 +88,8 @@ test("uses only the folders listed in the lock file", () => {
   const dir = makeProject({ locked: true, lockContent: "planning/ideas\nplanning/plans\n" });
   assert.strictEqual(runHook(writeCall(dir, "planning/ideas/001-x.md")).status, 0);
   assert.strictEqual(runHook(writeCall(dir, "planning/plans/001-x.md")).status, 0);
-  assert.strictEqual(runHook(writeCall(dir, "docs/plans/001-x.md")).status, 2);
-  assert.strictEqual(runHook(writeCall(dir, "docs/backlog/001-x.md")).status, 2);
+  assert.strictEqual(runHook(writeCall(dir, "docs/backlog/001-x/discussion.md")).status, 2);
+  assert.strictEqual(runHook(writeCall(dir, LOCK_FILE)).status, 0);
 });
 
 test("does not block on input it cannot parse", () => {
@@ -94,13 +102,13 @@ test("finds the lock through CLAUDE_PROJECT_DIR when cwd is a subfolder", () => 
   const env = { CLAUDE_PROJECT_DIR: dir };
   assert.strictEqual(runHook(writeCall(subfolder, path.join(subfolder, "a.ts")), env).status, 2);
   assert.strictEqual(runHook(writeCall(subfolder, "a.ts"), env).status, 2);
-  assert.strictEqual(runHook(writeCall(subfolder, "../docs/backlog/001-x.md"), env).status, 0);
+  assert.strictEqual(runHook(writeCall(subfolder, "../docs/backlog/001-x/plan.md"), env).status, 0);
 });
 
 test("ignores a lock older than two hours", () => {
   const dir = makeProject({ locked: true });
   const threeHoursAgo = new Date(Date.now() - 3 * 60 * 60 * 1000);
-  fs.utimesSync(path.join(dir, LOCK_NAME), threeHoursAgo, threeHoursAgo);
+  fs.utimesSync(path.join(dir, LOCK_FILE), threeHoursAgo, threeHoursAgo);
   assert.strictEqual(runHook(writeCall(dir, "src/x.ts")).status, 0);
 });
 
@@ -112,25 +120,25 @@ test("blocks Bash redirects and in-place edits outside the allowed folders", () 
   assert.strictEqual(statusOf(dir, "sed -i 's/a/b/' src/x.ts"), 2);
   assert.strictEqual(statusOf(dir, "perl -pi -e 's/a/b/' src/x.ts"), 2);
   assert.strictEqual(statusOf(dir, "rm -rf src"), 2);
-  assert.strictEqual(statusOf(dir, "mv docs/backlog/a.md src/a.md"), 2);
-  assert.strictEqual(statusOf(dir, "cp docs/backlog/a.md src/"), 2);
+  assert.strictEqual(statusOf(dir, "mv docs/backlog/001-x/a.md src/a.md"), 2);
+  assert.strictEqual(statusOf(dir, "cp docs/backlog/001-x/a.md src/"), 2);
   assert.strictEqual(statusOf(dir, 'bash -c "echo hi > src/x.ts"'), 2);
 });
 
 test("allows Bash commands that read or write only allowed files", () => {
   const dir = makeProject({ locked: true });
-  assert.strictEqual(statusOf(dir, "echo hi > docs/backlog/001-x.md"), 0);
+  assert.strictEqual(statusOf(dir, "echo hi > docs/backlog/001-x/discussion.md"), 0);
   assert.strictEqual(statusOf(dir, "cat src/a.ts 2>/dev/null | grep foo"), 0);
   assert.strictEqual(statusOf(dir, "npm test 2>&1"), 0);
   assert.strictEqual(statusOf(dir, "sed -n 1,20p src/a.ts"), 0);
-  assert.strictEqual(statusOf(dir, "cp src/a.ts docs/plans/a.ts"), 0);
-  assert.strictEqual(statusOf(dir, `rm ${LOCK_NAME}`), 0);
+  assert.strictEqual(statusOf(dir, "cp src/a.ts docs/backlog/001-x/a.ts"), 0);
+  assert.strictEqual(statusOf(dir, `rm ${LOCK_FILE}`), 0);
   assert.strictEqual(statusOf(dir, "git status && git log --oneline -5"), 0);
 });
 
 test("reads heredoc bodies as text, not as commands", () => {
   const dir = makeProject({ locked: true });
-  assert.strictEqual(statusOf(dir, "cat <<'EOF' > docs/backlog/001-x.md\nrm -rf src\nEOF"), 0);
+  assert.strictEqual(statusOf(dir, "cat <<'EOF' > docs/backlog/001-x/discussion.md\nrm -rf src\nEOF"), 0);
   assert.strictEqual(statusOf(dir, "cat <<EOF > src/x.ts\nhello\nEOF"), 2);
 });
 
@@ -153,9 +161,9 @@ test("blocks PowerShell writes outside the allowed folders", () => {
 
 test("allows PowerShell commands that read or write only allowed files", () => {
   const dir = makeProject({ locked: true });
-  assert.strictEqual(statusOf(dir, 'Set-Content -Path docs/backlog/x.md -Value "hi"', "PowerShell"), 0);
+  assert.strictEqual(statusOf(dir, 'Set-Content -Path docs/backlog/status.md -Value "hi"', "PowerShell"), 0);
   assert.strictEqual(statusOf(dir, "Get-Content src/x.ts", "PowerShell"), 0);
-  assert.strictEqual(statusOf(dir, "Copy-Item src/a.ts -Destination docs/plans/", "PowerShell"), 0);
+  assert.strictEqual(statusOf(dir, "Copy-Item src/a.ts -Destination docs/backlog/001-x/", "PowerShell"), 0);
   assert.strictEqual(statusOf(dir, "Write-Output hi 2>$null", "PowerShell"), 0);
 });
 
